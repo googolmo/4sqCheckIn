@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.googolmo.foursquare.http;
+package com.foursquare4j.http;
 
 /**
  * @author googolmo
