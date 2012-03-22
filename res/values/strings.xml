@@ -3,5 +3,8 @@
 
     <string name="hello">Hello World, mainActivity!</string>
     <string name="app_name">4sqCheckIn</string>
+    
+    <!-- main -->
+    <string name="button_oauth_text">OAuth</string>
 
 </resources>
