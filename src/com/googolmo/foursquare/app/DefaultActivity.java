@@ -23,9 +23,6 @@ public class DefaultActivity extends BaseActivity {
 		Bundle bundle = getIntent().getExtras();
 		String code = bundle.getString(PreferenceUtil.KEY_4SQCHECKIN_CODE);
 
-		TextView textView = (TextView) findViewById(R.id.main_app_text);
-		textView.setText(code);
-
 		super.onCreate(savedInstanceState);
 	}
 

@@ -7,7 +7,7 @@ public class Configuration {
 
 	public static final boolean ISDEBUG = true;
 
-	public static final String REDIRECTURL = "http://localhost";
+	public static final String REDIRECTURL = "http%3A%2F%2Flocalhost%2F";
 
 	public static String getClientID() {
 		return CLIENTID;

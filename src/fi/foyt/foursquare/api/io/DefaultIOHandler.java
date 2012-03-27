@@ -20,6 +20,8 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import com.googolmo.foursquare.R.color;
+
 /**
  * Default implementation of the IOHandler
  * 
@@ -28,146 +30,166 @@ import java.net.URL;
  */
 public class DefaultIOHandler extends IOHandler {
 
-  @Override
-  public Response fetchData(String url, Method method) {
-    int code = 200;
+	@Override
+	public Response fetchData(String url, Method method) {
+		int code = 200;
 
-    try {
-      URL aUrl = new URL(url);
-      HttpURLConnection connection = (HttpURLConnection) aUrl.openConnection();
-      try {
-        connection.setDoInput(true);
-        connection.setDoOutput(true);
-        connection.setRequestMethod(method.name());
-        connection.connect();
+		try {
+			System.out.println("method=" + method.name() + "url=" + url);
+			URL aUrl = new URL(url);
+			HttpURLConnection connection = (HttpURLConnection) aUrl
+					.openConnection();
+			try {
+				connection.setRequestMethod(method.name());
+				// connection
+				// .setRequestProperty("Accept-Charset", "UTF-8,*;q=0.5");
+				connection.addRequestProperty("User-Agent", "GoogolMo");
+				// connection.setRequestProperty("X-HostCommonName",
+				// "api.foursquare.com");
+				connection.setRequestProperty("X-Target-URI",
+						"https://api.foursquare.com");
+				connection.setDoInput(true);
+				if (method.name().equals(Method.POST)) {
+					connection.setRequestProperty("Content-Type",
+							"application/x-www-form-urlencoded");
+					connection.setDoOutput(true);
+				}
 
-        code = connection.getResponseCode();
-        if (code == 200) {
-          InputStream inputStream = connection.getInputStream();
-          return new Response(readStream(inputStream), code, connection.getResponseMessage());
-        } else {
-          return new Response("", code, getMessageByCode(code));
-        }
+				connection.connect();
 
-      } finally {
-        connection.disconnect();
-      }
-    } catch (MalformedURLException e) {
-      return new Response("", 400, "Malformed URL: " + url);
-    } catch (IOException e) {
-      return new Response("", 500, e.getMessage());
-    }
-  }
+				code = connection.getResponseCode();
 
-  @Override
-  public Response fetchDataMultipartMime(String url, MultipartParameter... parameters) {
-    int code = 200;
+				if (code == 200) {
+					InputStream inputStream = connection.getInputStream();
+					return new Response(readStream(inputStream), code,
+							connection.getResponseMessage());
+				} else {
+					return new Response("", code, getMessageByCode(code));
+				}
 
-    try {
-      URL aUrl = new URL(url);
-      HttpURLConnection connection = (HttpURLConnection) aUrl.openConnection();
-      try {
-        connection.setDoInput(true);
-        connection.setDoOutput(true);
-        connection.setRequestMethod("POST");
-        connection.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + BOUNDARY);
-        connection.connect();
+			} finally {
+				connection.disconnect();
+			}
+		} catch (MalformedURLException e) {
+			return new Response("", 400, "Malformed URL: " + url);
+		} catch (IOException e) {
+			return new Response("", 500, e.getMessage());
+		}
+	}
 
-        OutputStream outputStream = connection.getOutputStream();
-        
-        StringBuffer startBoundaryBuilder = new StringBuffer("--")
-          .append(BOUNDARY)
-          .append("\r\n");
-        
-        outputStream.write(startBoundaryBuilder.toString().getBytes());
-        
-        for (MultipartParameter parameter : parameters) {
-          StringBuffer formDataBuilder = new StringBuffer()
-            .append("Content-Disposition: form-data; name=\"")
-            .append(parameter.getName())
-            .append("\"; filename=\"")
-            .append(parameter.getName())
-            .append("\"\r\n")
-            .append("Content-Type: ")
-            .append(parameter.getContentType())
-            .append("\r\n\r\n");
-          outputStream.write(formDataBuilder.toString().getBytes());
-          outputStream.write(parameter.getContent());
-        }
-        
-        StringBuilder endBoundaryBuilder = new StringBuilder("\r\n--")
-          .append(BOUNDARY)
-          .append("--\r\n");
-        outputStream.write(endBoundaryBuilder.toString().getBytes());
+	@Override
+	public Response fetchDataMultipartMime(String url,
+			MultipartParameter... parameters) {
+		int code = 200;
 
-        outputStream.flush();
-        outputStream.close();
+		try {
+			URL aUrl = new URL(url);
+			HttpURLConnection connection = (HttpURLConnection) aUrl
+					.openConnection();
+			try {
+				connection.setDoInput(true);
+				connection.setDoOutput(true);
+				connection.setRequestMethod("POST");
+				connection.setRequestProperty("Content-Type",
+						"multipart/form-data; boundary=" + BOUNDARY);
+				connection.connect();
 
-        code = connection.getResponseCode();
-        if (code == 200) {
-          InputStream inputStream = connection.getInputStream();
-          return new Response(readStream(inputStream), code, connection.getResponseMessage());
-        } else {
-          return new Response("", code, getMessageByCode(code));
-        }
+				OutputStream outputStream = connection.getOutputStream();
 
-      } finally {
-        connection.disconnect();
-      }
-    } catch (MalformedURLException e) {
-      return new Response("", 400, "Malformed URL: " + url);
-    } catch (IOException e) {
-      return new Response("", 500, e.getMessage());
-    }
-  }
+				StringBuffer startBoundaryBuilder = new StringBuffer("--")
+						.append(BOUNDARY).append("\r\n");
 
-  /**
-   * Reads input stream and returns it's contents as String
-   * 
-   * @param inputStream input stream to be readed
-   * @return Stream's content
-   * @throws IOException 
-   */
-  private String readStream(InputStream inputStream) throws IOException {
-    StringWriter responseWriter = new StringWriter();
+				outputStream.write(startBoundaryBuilder.toString().getBytes());
 
-    char[] buf = new char[1024];
-    int l = 0;
+				for (MultipartParameter parameter : parameters) {
+					StringBuffer formDataBuilder = new StringBuffer()
+							.append("Content-Disposition: form-data; name=\"")
+							.append(parameter.getName())
+							.append("\"; filename=\"")
+							.append(parameter.getName()).append("\"\r\n")
+							.append("Content-Type: ")
+							.append(parameter.getContentType())
+							.append("\r\n\r\n");
+					outputStream.write(formDataBuilder.toString().getBytes());
+					outputStream.write(parameter.getContent());
+				}
 
-    InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
-    while ((l = inputStreamReader.read(buf)) > 0) {
-      responseWriter.write(buf, 0, l);
-    }
+				StringBuilder endBoundaryBuilder = new StringBuilder("\r\n--")
+						.append(BOUNDARY).append("--\r\n");
+				outputStream.write(endBoundaryBuilder.toString().getBytes());
 
-    responseWriter.flush();
-    responseWriter.close();
-    return responseWriter.getBuffer().toString();
-  }
+				outputStream.flush();
+				outputStream.close();
 
-  /**
-   * Returns message for code
-   * 
-   * @param code code
-   * @return Message
-   */
-  private String getMessageByCode(int code) {
-    switch (code) {
-      case 400:
-        return "Bad Request";
-      case 401:
-        return "Unauthorized";
-      case 403:
-        return "Forbidden";
-      case 404:
-        return "Not Found";
-      case 405:
-        return "Method Not Allowed";
-      case 500:
-        return "Internal Server Error";
-      default:
-        return "Unknown";
-    }
-  }
+				code = connection.getResponseCode();
+				if (code == 200) {
+					InputStream inputStream = connection.getInputStream();
+					return new Response(readStream(inputStream), code,
+							connection.getResponseMessage());
+				} else {
+					return new Response("", code, getMessageByCode(code));
+				}
 
-  private static String BOUNDARY = "----------gc0p4Jq0M2Yt08jU534c0p";
+			} finally {
+				connection.disconnect();
+			}
+		} catch (MalformedURLException e) {
+			return new Response("", 400, "Malformed URL: " + url);
+		} catch (IOException e) {
+			return new Response("", 500, e.getMessage());
+		}
+	}
+
+	/**
+	 * Reads input stream and returns it's contents as String
+	 * 
+	 * @param inputStream
+	 *            input stream to be readed
+	 * @return Stream's content
+	 * @throws IOException
+	 */
+	private String readStream(InputStream inputStream) throws IOException {
+		StringWriter responseWriter = new StringWriter();
+
+		char[] buf = new char[1024];
+		int l = 0;
+
+		InputStreamReader inputStreamReader = new InputStreamReader(
+				inputStream, "UTF-8");
+		while ((l = inputStreamReader.read(buf)) > 0) {
+			responseWriter.write(buf, 0, l);
+		}
+
+		responseWriter.flush();
+		responseWriter.close();
+		return responseWriter.getBuffer().toString();
+	}
+
+	/**
+	 * Returns message for code
+	 * 
+	 * @param code
+	 *            code
+	 * @return Message
+	 */
+	private String getMessageByCode(int code) {
+		switch (code) {
+		case 400:
+			return "Bad Request";
+		case 401:
+			return "Unauthorized";
+		case 403:
+			return "Forbidden";
+		case 404:
+			return "Not Found";
+		case 405:
+			return "Method Not Allowed";
+		case 500:
+			return "Internal Server Error";
+		default:
+			return "Unknown";
+		}
+	}
+
+	private static String BOUNDARY = "----------gc0p4Jq0M2Yt08jU534c0p";
 }

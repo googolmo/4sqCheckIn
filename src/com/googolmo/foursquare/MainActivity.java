@@ -1,97 +1,114 @@
 package com.googolmo.foursquare;
 
-import java.nio.channels.SelectableChannel;
-
-import com.googolmo.foursquare.app.DefaultActivity;
+import com.googolmo.foursquare.app.NavExploreActivity;
+import com.googolmo.foursquare.app.NavFriendActivity;
+import com.googolmo.foursquare.app.NavMeActivity;
 import com.googolmo.foursquare.app.OAuthAcitivity;
 import com.googolmo.foursquare.utils.LogUtil;
 import com.googolmo.foursquare.utils.PreferenceUtil;
 
+import fi.foyt.foursquare.api.FoursquareApi;
+import fi.foyt.foursquare.api.FoursquareApiException;
+import fi.foyt.foursquare.api.Result;
+import fi.foyt.foursquare.api.entities.CompactUser;
+import fi.foyt.foursquare.api.entities.CompleteUser;
+import fi.foyt.foursquare.api.io.IOHandler;
+
+import android.app.TabActivity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
+import android.widget.TabHost;
 
-public class MainActivity extends BaseActivity {
+public class MainActivity extends TabActivity {
 
 	private LogUtil log = LogUtil.getLog(this.getClass().getName());
 
-	private Button buttonOAuth;
+	TabHost tabHost;
+	TabHost.TabSpec tabSpec;
 
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.main);
+		setContentView(R.layout.main_app);
 
-		String code = PreferenceUtil.getCode(this);
-		if (!code.equals("")) {
-			log.debug(code);
-			Intent intent = new Intent(this, DefaultActivity.class);
-			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-
-			intent.putExtra(PreferenceUtil.KEY_4SQCHECKIN_CODE, code);
-
+		final String oauthToken = PreferenceUtil.getOAuthToken(this);
+		if (oauthToken.equals("")) {
+			Intent intent = new Intent(MainActivity.this, OAuthAcitivity.class);
 			startActivity(intent);
 			finish();
-
-		} else {
-			setupView();
 		}
-
-		// setContentView(R.layout.main);
+		setupView();
+		log.debug(oauthToken);
+		// PreferenceUtil.setOAuthToken(MainActivity.this, oauthToken);
+		final FoursquareApi api = ((CheckInApplication) getApplication())
+				.getApi();
+		api.setoAuthToken(oauthToken);
+		// new Thread(new Runnable() {
 		//
+		// @Override
+		// public void run() {
+		// // TODO Auto-generated method stub
+		// try {
 		//
-		//
-		// FoursquareApi foursquareApi = new FoursquareApi(
-		// Configuration.getClientID(), Configuration.getClientSecret(),
-		// RedirectUrl);
-		// String url = foursquareApi.getAuthenticationUrl();
-		//
-		// // oauthWebView = (WebView) findViewById(R.id.webview_oauth);
-		// // oauthWebView.getSettings().setJavaScriptEnabled(true);
-		// // oauthWebView.setWebViewClient(new WebViewClient() {
-		// //
-		// // @Override
-		// // public void onPageStarted(WebView view, String url, Bitmap
-		// favicon) {
-		// // // TODO Auto-generated method stub
-		// // super.onPageStarted(view, url, favicon);
-		// // String fragment = "code=";
-		// // int start = url.indexOf(fragment);
-		// // Log.d("34", start + "");
-		// // if (start > -1) {
-		// // // You can use the accessToken for api calls now.
-		// // String accessToken = url.substring(
-		// // start + fragment.length(), url.length());
-		// //
-		// // Log.d("34", "OAuth complete, token: [" + accessToken + "].");
-		// // Toast.makeText(mainActivity.this, accessToken,
-		// // Toast.LENGTH_SHORT).show();
-		// // }
-		// // }
-		// //
-		// // });
-		// // oauthWebView.loadUrl(url);
-		//
-		// // foursquareApi.authenticateCode(code)
+		// Result<CompactUser[]> user = api.usersRequests();
+		// if (user == null) {
+		// log.debug("is null");
+		// }
+		// if (user.getResult() == null) {
+		// log.error("user result is null "
+		// + user.getMeta().getCode());
+		// } else {
+		// log.debug(user.getResult()[0].getFirstName());
+		// }
+		// } catch (FoursquareApiException e) {
+		// // TODO Auto-generated catch block
+		// e.printStackTrace();
+		// }
+		// }
+		// }).start();
 
 	}
 
 	private void setupView() {
+		tabHost = getTabHost();
 
-		buttonOAuth = (Button) findViewById(R.id.button_oauth);
+		Intent intent;
 
-		buttonOAuth.setOnClickListener(oAuthClickListener);
+		intent = new Intent(this, NavExploreActivity.class);
+		tabSpec = getTabHost()
+				.newTabSpec("NavExplore")
+				.setIndicator(
+						"Explore",
+						getResources().getDrawable(
+								R.drawable.tab_main_nav_explore_selector))
+				.setContent(intent);
+
+		tabHost.addTab(tabSpec);
+
+		intent = new Intent(this, NavFriendActivity.class);
+		tabSpec = getTabHost()
+				.newTabSpec("NavFriend")
+				.setIndicator(
+						"Friend",
+						getResources().getDrawable(
+								R.drawable.tab_main_nav_friends_selector))
+				.setContent(intent);
+		tabHost.addTab(tabSpec);
+
+		intent = new Intent(this, NavMeActivity.class);
+		tabSpec = getTabHost()
+				.newTabSpec("NavMe")
+				.setIndicator(
+						"Me",
+						getResources().getDrawable(
+								R.drawable.tab_main_nav_me_boy_selector))
+				.setContent(intent);
+		tabHost.addTab(tabSpec);
+
+		tabHost.setCurrentTab(0);
+
 	}
-
-	private View.OnClickListener oAuthClickListener = new View.OnClickListener() {
-
-		@Override
-		public void onClick(View v) {
-			Intent intent = new Intent(MainActivity.this, OAuthAcitivity.class);
-			startActivity(intent);
-		}
-	};
 
 }

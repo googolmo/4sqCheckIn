@@ -20,6 +20,7 @@ public class CheckInApplication extends Application {
 		if (api == null) {
 			api = new FoursquareApi(Configuration.CLIENTID,
 					Configuration.CLIENTSECRET, Configuration.REDIRECTURL);
+			api.setUseCallback(false);
 		}
 		return api;
 	}
