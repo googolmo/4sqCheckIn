@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@id/main"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:layout_margin="0.0dip"
+    android:background="@drawable/listview_background"
+    android:orientation="vertical"
+    android:padding="0.0dip" >
+
+    <FrameLayout
+        android:layout_width="fill_parent"
+        android:layout_height="0.0dip"
+        android:layout_weight="1.0"
+        android:orientation="vertical" >
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:orientation="vertical" >
+
+            <LinearLayout
+                android:id="@id/viewNetworkProviderOff"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/warning_banner_selector"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:visibility="gone" >
+
+                <TextView
+                    android:id="@id/tvNetworkProviderOff"
+                    android:layout_width="0.0dip"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1.0"
+                    android:padding="8.0dip"
+                    android:text="@string/location_no_network_provider"
+                    android:textColor="#ffffffff"
+                    android:textSize="14.0sp"
+                    android:textStyle="bold" />
+
+                <ImageView
+                    android:layout_width="9.0dip"
+                    android:layout_height="13.0dip"
+                    android:layout_marginLeft="5.0dip"
+                    android:layout_marginRight="5.0dip"
+                    android:src="@drawable/arrow_white" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@id/viewListview"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:orientation="vertical" >
+
+                <ListView
+                    android:id="@id/listview"
+                    style="@style/ListView"
+                    android:layout_width="fill_parent"
+                    android:layout_height="0.0dip"
+                    android:layout_weight="1.0" />
+
+                <include
+                    android:id="@id/empty_loading_layout"
+                    android:layout_width="fill_parent"
+                    android:layout_height="0.0dip"
+                    android:layout_weight="1.0"
+                    layout="@layout/empty_loading" />
+            </LinearLayout>
+
+            <ScrollView
+                android:id="@id/viewNoLocationProviders"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:fillViewport="true" >
+
+                <include
+                    android:id="@id/empty_image_with_text"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    layout="@layout/empty_image_with_text" />
+            </ScrollView>
+        </LinearLayout>
+    </FrameLayout>
+
+</LinearLayout>

@@ -1,0 +1,374 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@id/main"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:layout_margin="0.0dip"
+    android:background="#ffebebeb"
+    android:orientation="vertical"
+    android:padding="0.0dip" >
+
+    <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="0.0dip"
+        android:layout_weight="1.0"
+        android:fadingEdgeLength="0.0dip" >
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:orientation="vertical" >
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:orientation="vertical"
+                android:padding="10.0dip" >
+
+                <TextView
+                    android:id="@id/checkinResultsMessage"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/checkin_message_bg"
+                    android:padding="10.0dip"
+                    android:text="Checkin Message"
+                    android:textColor="#ff000000" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@id/checkinResultsHeaderBadges"
+                android:layout_width="fill_parent"
+                android:layout_height="23.0dip"
+                android:background="@drawable/arrow_banner_blue"
+                android:gravity="center_vertical" >
+
+                <TextView
+                    android:id="@id/checkinResultsHeaderMayorText"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5.0dip"
+                    android:paddingRight="20.0dip"
+                    android:text="@string/checkin_result_dialog_badges"
+                    android:textColor="#ffffffff"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@id/checkinResultsBodyBadges"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="7.0dip"
+                android:orientation="vertical" />
+
+            <LinearLayout
+                android:id="@id/checkinResultsHeaderMayor"
+                android:layout_width="fill_parent"
+                android:layout_height="23.0dip"
+                android:background="@drawable/arrow_banner_yellow"
+                android:gravity="center_vertical" >
+
+                <TextView
+                    android:id="@id/checkinResultsHeaderMayorText"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5.0dip"
+                    android:paddingRight="20.0dip"
+                    android:text="@string/mayor_header"
+                    android:textColor="#ffffffff"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@id/checkinResultsBodyMayor"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="7.0dip"
+                android:orientation="horizontal" >
+
+                <ImageView
+                    android:id="@id/checkinResultsBodyMayorImage"
+                    android:layout_width="32.0dip"
+                    android:layout_height="32.0dip"
+                    android:layout_marginLeft="5.0dip"
+                    android:layout_marginRight="4.0dip"
+                    android:layout_marginTop="9.0dip" />
+
+                <ImageView
+                    android:id="@id/checkinResultsBodyMayorIcon"
+                    android:layout_width="21.0dip"
+                    android:layout_height="17.0dip"
+                    android:layout_marginLeft="5.0dip"
+                    android:layout_marginRight="5.0dip"
+                    android:layout_marginTop="9.0dip"
+                    android:src="@drawable/curve_arrow_green" />
+
+                <TextView
+                    android:id="@id/checkinResultsBodyMayorText"
+                    android:layout_width="0.0dip"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5.0dip"
+                    android:layout_marginRight="5.0dip"
+                    android:layout_marginTop="5.0dip"
+                    android:layout_weight="1.0"
+                    android:text="Mayorship message"
+                    android:textColor="#ff000000" />
+
+                <LinearLayout
+                    android:id="@id/checkinResultsBodyMayorCalendarIcon"
+                    android:layout_width="47.0dip"
+                    android:layout_height="45.0dip"
+                    android:layout_marginRight="5.0dip"
+                    android:layout_marginTop="2.0dip"
+                    android:background="@drawable/calendar"
+                    android:gravity="center" >
+
+                    <TextView
+                        android:id="@id/checkinResultsBodyMayorCalendarText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingTop="11.0dip"
+                        android:text="N"
+                        android:textColor="#ff000000"
+                        android:textSize="20.0sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@id/checkinResultsHeaderPoints"
+                android:layout_width="fill_parent"
+                android:layout_height="23.0dip"
+                android:background="@drawable/arrow_banner_blue"
+                android:gravity="center_vertical" >
+
+                <TextView
+                    android:id="@id/checkinResultsHeaderPointsText"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5.0dip"
+                    android:paddingRight="20.0dip"
+                    android:text="@string/checkin_points"
+                    android:textColor="#ffffffff"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@id/checkinResultsBodyPoints"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="7.0dip"
+                android:orientation="vertical" >
+
+                <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5.0dip"
+                    android:orientation="horizontal" >
+
+                    <TextView
+                        android:id="@id/checkinResultsBodyPointsMessage"
+                        android:layout_width="0.0dip"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="5.0dip"
+                        android:layout_weight="1.0"
+                        android:text="Checkin in score message:"
+                        android:textColor="#ff000000"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@id/checkinResultsBodyPointsValue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="5.0dip"
+                        android:background="@drawable/checkin_score_bg"
+                        android:paddingLeft="2.0dip"
+                        android:paddingRight="2.0dip"
+                        android:text="+N"
+                        android:textAppearance="@style/TextViewStyleCheckinResultEmbossed"
+                        android:textSize="14.0sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@id/checkinResultsHeaderLeaderboard"
+                android:layout_width="fill_parent"
+                android:layout_height="23.0dip"
+                android:background="@drawable/arrow_banner_blue"
+                android:gravity="center_vertical" >
+
+                <TextView
+                    android:id="@id/checkinResultsHeaderLeaderboardText"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5.0dip"
+                    android:paddingRight="20.0dip"
+                    android:text="@string/checkin_leaderboard"
+                    android:textColor="#ffffffff"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@id/checkinResultsBodyLeaderboard"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="7.0dip"
+                android:background="@android:drawable/list_selector_background"
+                android:orientation="vertical" >
+
+                <TextView
+                    android:id="@id/checkinResultsHeaderLeaderboardMessage"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="3.0dip"
+                    android:layout_marginLeft="5.0dip"
+                    android:layout_marginTop="5.0dip"
+                    android:text="Leaderboard message" />
+
+                <include
+                    android:id="@id/checkinResultsLeaderboard0"
+                    layout="@layout/leaderboard_condensed_list_item" />
+
+                <include
+                    android:id="@id/checkinResultsLeaderboard1"
+                    layout="@layout/leaderboard_condensed_list_item" />
+
+                <include
+                    android:id="@id/checkinResultsLeaderboard2"
+                    layout="@layout/leaderboard_condensed_list_item" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@id/checkinResultsHeaderSpecials"
+                android:layout_width="fill_parent"
+                android:layout_height="23.0dip"
+                android:background="@drawable/arrow_banner_orange"
+                android:gravity="center_vertical" >
+
+                <TextView
+                    android:id="@id/checkinResultsHeaderSpecialsText"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5.0dip"
+                    android:paddingRight="20.0dip"
+                    android:text="@string/checkin_specials"
+                    android:textColor="#ffffffff"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@id/checkinResultsBodySpecials"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="7.0dip"
+                android:orientation="vertical" />
+
+            <LinearLayout
+                android:id="@id/checkinResultsHeaderPopularTip"
+                android:layout_width="fill_parent"
+                android:layout_height="23.0dip"
+                android:background="@drawable/arrow_banner_blue"
+                android:gravity="center_vertical" >
+
+                <TextView
+                    android:id="@id/checkinResultsHeaderPopularTipText"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5.0dip"
+                    android:paddingRight="20.0dip"
+                    android:text="Popular tip"
+                    android:textColor="#ffffffff"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <RelativeLayout
+                android:id="@id/checkinResultsBodyPopularTip"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="7.0dip"
+                android:background="@android:drawable/list_selector_background" >
+
+                <ImageView
+                    android:id="@id/checkinResultsBodyPopularTipIcon"
+                    android:layout_width="17.0dip"
+                    android:layout_height="27.0dip"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentTop="true"
+                    android:layout_margin="5.0dip"
+                    android:layout_marginTop="6.0dip"
+                    android:src="@drawable/tip_icon_user_orange" />
+
+                <TextView
+                    android:id="@id/checkinResultsBodyPopularTipText"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginBottom="1.0dip"
+                    android:layout_marginLeft="5.0dip"
+                    android:layout_marginRight="5.0dip"
+                    android:layout_marginTop="3.0dip"
+                    android:layout_toRightOf="@id/checkinResultsBodyPopularTipIcon"
+                    android:text="Popular tip message"
+                    android:textColor="#ff000000" />
+
+                <TextView
+                    android:id="@id/checkinResultsBodyPopularTipDate"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/checkinResultsBodyPopularTipText"
+                    android:layout_marginLeft="5.0dip"
+                    android:layout_marginRight="5.0dip"
+                    android:layout_toRightOf="@id/checkinResultsBodyPopularTipIcon"
+                    android:text="Popular tip date"
+                    android:textColor="#aa000000"
+                    android:textSize="11.0sp" />
+            </RelativeLayout>
+        </LinearLayout>
+    </ScrollView>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="1.0px"
+        android:background="@color/dark_grey_toolbar_pix_0" />
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="1.0px"
+        android:background="@color/dark_grey_toolbar_pix_1" />
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="50.0dip"
+        android:layout_alignParentBottom="true"
+        android:background="@color/invite_friends_button_bg"
+        android:paddingBottom="5.0dip"
+        android:paddingLeft="5.0dip"
+        android:paddingRight="5.0dip"
+        android:paddingTop="5.0dip" >
+
+        <LinearLayout
+            android:layout_width="0.0dip"
+            android:layout_height="1.0dip"
+            android:layout_weight="1.0" />
+
+        <LinearLayout
+            android:id="@id/checkinResultsBtnClose"
+            android:layout_width="0.0dip"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5.0dip"
+            android:layout_weight="1.0"
+            android:background="@drawable/checkin_results_done_btn_selector"
+            android:gravity="center" >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5.0dip"
+                android:clickable="false"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:text="@string/done"
+                android:textAppearance="@style/TextViewStyleListItemActivityButtons" />
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>

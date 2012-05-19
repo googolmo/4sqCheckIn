@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@id/parent"
+    style="@style/ListViewItem"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:paddingBottom="7.0dip"
+    android:paddingRight="7.0dip"
+    android:paddingTop="3.0dip" >
+
+    <ImageView
+        android:id="@id/photo"
+        android:layout_width="54.0dip"
+        android:layout_height="54.0dip"
+        android:layout_alignParentLeft="true"
+        android:layout_marginBottom="15.0dip"
+        android:layout_marginLeft="7.0dip"
+        android:layout_marginRight="8.0dip"
+        android:layout_marginTop="5.0dip"
+        android:background="@drawable/photo_background"
+        android:gravity="center_vertical"
+        android:padding="4.0dip"
+        android:scaleType="fitXY"
+        android:src="@drawable/blank_boy" />
+
+    <ImageView
+        android:id="@id/crown"
+        android:layout_width="16.0dip"
+        android:layout_height="12.0dip"
+        android:layout_alignParentTop="true"
+        android:layout_marginRight="5.0dip"
+        android:layout_marginTop="7.0dip"
+        android:layout_toRightOf="@id/photo"
+        android:scaleType="fitXY"
+        android:src="@drawable/crown_small" />
+
+    <TextView
+        android:id="@id/username"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@id/crown"
+        android:maxLines="1"
+        android:paddingLeft="1.0dip"
+        android:paddingRight="2.0dip"
+        android:paddingTop="2.0dip"
+        android:singleLine="true"
+        android:textAppearance="@style/TextViewStyleListItemBold" />
+
+    <TextView
+        android:id="@id/atsymbol"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@id/username"
+        android:paddingLeft="2.0dip"
+        android:paddingRight="2.0dip"
+        android:paddingTop="2.0dip"
+        android:text=" @ "
+        android:textAppearance="@style/TextViewStyleListItemBold" />
+
+    <TextView
+        android:id="@id/venuename"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@id/atsymbol"
+        android:maxLines="1"
+        android:paddingLeft="2.0dip"
+        android:paddingRight="2.0dip"
+        android:paddingTop="2.0dip"
+        android:singleLine="true"
+        android:textAppearance="@style/TextViewStyleListItemBold" />
+
+    <TextView
+        android:id="@id/secondLine"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/username"
+        android:layout_toRightOf="@id/photo"
+        android:ellipsize="none"
+        android:paddingLeft="1.0dip"
+        android:scrollHorizontally="false"
+        android:singleLine="false"
+        android:textAppearance="@style/TextViewStyleCheckinListItemLineShout" />
+
+    <LinearLayout
+        android:id="@id/photoLargeBackground"
+        android:layout_width="300.0dip"
+        android:layout_height="125.0dip"
+        android:layout_below="@id/secondLine"
+        android:layout_marginBottom="3.0dip"
+        android:layout_marginRight="8.0dip"
+        android:layout_marginTop="6.0dip"
+        android:layout_toRightOf="@id/photo"
+        android:background="@drawable/photo_background"
+        android:gravity="center"
+        android:padding="5.0dip" >
+
+        <ImageView
+            android:id="@id/photoLarge"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:scaleType="centerCrop"
+            android:src="@drawable/checkin_photo_loading" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@id/checkinPhotoComment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/photoLargeBackground"
+        android:layout_margin="0.0dip"
+        android:layout_toRightOf="@id/photo"
+        android:orientation="horizontal"
+        android:paddingBottom="0.0dip"
+        android:paddingLeft="0.0dip"
+        android:paddingRight="8.0dip"
+        android:paddingTop="1.0dip" >
+
+        <ImageView
+            android:id="@id/timestamp_icon"
+            android:layout_width="10.0dip"
+            android:layout_height="10.0dip"
+            android:layout_below="@id/secondLine"
+            android:layout_marginLeft="1.0dip"
+            android:layout_marginRight="3.0dip"
+            android:layout_marginTop="4.0dip"
+            android:layout_toRightOf="@id/photo"
+            android:scaleType="fitXY"
+            android:src="@drawable/event_small" />
+
+        <TextView
+            android:id="@id/timeTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/secondLine"
+            android:layout_toRightOf="@id/timestamp_icon"
+            android:maxLines="1"
+            android:paddingLeft="1.0dip"
+            android:paddingRight="4.0dip"
+            android:singleLine="true"
+            android:textAppearance="@style/TextViewStyleCheckinListItemLineTimestamp" />
+
+        <ImageView
+            android:id="@id/checkinPhotoIcon"
+            android:layout_width="17.0dip"
+            android:layout_height="17.0dip"
+            android:layout_marginRight="2.0dip"
+            android:layout_marginTop="1.0dip"
+            android:src="@drawable/photos" />
+
+        <TextView
+            android:id="@id/checkinPhotoText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingRight="4.0dip"
+            android:textAppearance="@style/TextViewStyleCheckinListItemLineTimestamp" />
+
+        <ImageView
+            android:id="@id/checkinCommentIcon"
+            android:layout_width="17.0dip"
+            android:layout_height="17.0dip"
+            android:layout_marginRight="2.0dip"
+            android:layout_marginTop="1.0dip"
+            android:src="@drawable/comments" />
+
+        <TextView
+            android:id="@id/checkinCommentText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingRight="4.0dip"
+            android:textAppearance="@style/TextViewStyleCheckinListItemLineTimestamp" />
+    </LinearLayout>
+
+</RelativeLayout>

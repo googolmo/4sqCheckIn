@@ -7,6 +7,8 @@ public class Configuration {
 
 	public static final boolean ISDEBUG = true;
 
+	public static final String MAPABC_APIKEY = "c2b0f58a6f09cafd1503c06ef08ac7aeb7ddb91aaeab9458b6b92263b894f634b7b447425958c228";
+
 	public static final String REDIRECTURL = "http%3A%2F%2Flocalhost%2F";
 
 	public static String getClientID() {

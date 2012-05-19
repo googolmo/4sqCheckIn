@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@id/main"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" >
+
+        <ScrollView
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:background="#ff717171" >
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:orientation="vertical"
+                android:padding="0.0dip" >
+
+                <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    
+                    android:orientation="vertical"
+                    android:padding="10.0dip" >
+
+                    <LinearLayout
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2.0dip"
+                        android:orientation="horizontal" >
+
+                        <RelativeLayout
+                            android:layout_width="0.0dip"
+                            android:layout_height="100.0dip"
+                            android:layout_weight="1.0" >
+
+                            <EditText
+                                android:id="@id/editTextShout"
+                                style="@style/checkinShoutText"
+                                android:layout_width="fill_parent"
+                                android:layout_height="fill_parent"
+                                android:hint="@string/what_are_you_up_to"
+                                android:imeOptions="actionDone"
+                                android:inputType="textCapSentences|textAutoCorrect|textMultiLine"
+                                android:maxLength="140"
+                                android:maxLines="3" />
+
+                            <TextView
+                                android:id="@id/shoutCharactersLeft"
+                                style="@style/checkinShoutCountText"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentRight="true"
+                                android:layout_marginRight="10.0dip"
+                                android:textColor="#ff333333"
+                                android:textSize="14.0sp" />
+                        </RelativeLayout>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="1.0px"
+                    android:layout_marginBottom="10.0dip"
+                    android:background="#ff000000" />
+
+                <LinearLayout
+                    android:id="@id/sectionShareFriends"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="13.0dip"
+                    android:layout_marginLeft="10.0dip"
+                    android:layout_marginRight="10.0dip"
+                    android:background="@drawable/checkin_section_bg"
+                    android:orientation="horizontal"
+                    android:paddingBottom="7.0dip"
+                    android:paddingTop="7.0dip" >
+
+                    <TextView
+                        android:layout_width="0.0dip"
+                        android:layout_height="fill_parent"
+                        android:layout_marginLeft="8.0dip"
+                        android:layout_weight="1.0"
+                        android:gravity="center_vertical"
+                        android:text="@string/checkin_or_shout_gather_info_activity_share_with_friends"
+                        android:textAppearance="@style/TextViewStyleAddTipTodoActivityNormal" />
+
+                    <Button
+                        android:id="@id/btnShareWithFriendsYes"
+                        android:layout_width="50.0dip"
+                        android:layout_height="33.0dip"
+                        android:background="@drawable/yes_toggle_on"
+                        android:text="@string/yes"
+                        android:textAppearance="@style/TextViewStyleCheckinYesNoButtons"
+                        android:textColor="@color/white" />
+
+                    <Button
+                        android:id="@id/btnShareWithFriendsNo"
+                        android:layout_width="50.0dip"
+                        android:layout_height="33.0dip"
+                        android:layout_marginRight="8.0dip"
+                        android:background="@drawable/no_toggle_off"
+                        android:text="@string/no"
+                        android:textAppearance="@style/TextViewStyleCheckinYesNoButtons"
+                        android:textColor="@color/white" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@id/sectionShareExternal"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="13.0dip"
+                    android:layout_marginLeft="10.0dip"
+                    android:layout_marginRight="10.0dip"
+                    android:background="@drawable/checkin_section_bg"
+                    android:orientation="horizontal"
+                    android:paddingBottom="7.0dip"
+                    android:paddingTop="7.0dip" >
+
+                    <TextView
+                        android:layout_width="0.0dip"
+                        android:layout_height="fill_parent"
+                        android:layout_marginLeft="8.0dip"
+                        android:layout_weight="1.0"
+                        android:gravity="center_vertical"
+                        android:text="@string/checkin_or_shout_gather_info_activity_share_with_other"
+                        android:textAppearance="@style/TextViewStyleAddTipTodoActivityNormal" />
+
+                    <Button
+                        android:id="@id/btnShareFacebook"
+                        android:layout_width="33.0dip"
+                        android:layout_height="33.0dip"
+                        android:layout_marginRight="15.0dip"
+                        android:background="@drawable/modal_fb_off"
+                        android:contentDescription="@string/share_with_facebook_description" />
+
+                    <Button
+                        android:id="@id/btnShareTwitter"
+                        android:layout_width="33.0dip"
+                        android:layout_height="33.0dip"
+                        android:layout_marginRight="8.0dip"
+                        android:background="@drawable/modal_twitter_off"
+                        android:contentDescription="@string/share_with_twitter_description" />
+                </LinearLayout>
+
+                <Button
+                    android:id="@id/btnCheckin"
+                    style="@style/greenButton"
+                    android:layout_width="fill_parent"
+                    android:layout_height="42.0dip"
+                    android:layout_marginLeft="10.0dip"
+                    android:layout_marginRight="10.0dip"
+                    android:layout_marginTop="10.0dip"
+                    android:text="@string/checkin_action_label" />
+            </LinearLayout>
+        </ScrollView>
+    </RelativeLayout>
+
+</LinearLayout>

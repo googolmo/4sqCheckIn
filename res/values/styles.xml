@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="ListView">
+        <item name="android:scrollbars">vertical</item>
+        <item name="android:fadingEdgeLength">0.0dip</item>
+        <item name="android:drawSelectorOnTop">false</item>
+        <item name="android:cacheColorHint">#ffebebeb</item>
+        <item name="android:divider">@drawable/listview_divider</item>
+        <item name="android:dividerHeight">1.0px</item>
+    </style>
+
+    <style name="ListViewItem">
+        <item name="android:background">@drawable/listview_item_selector</item>
+        <item name="android:minHeight">40.0dip</item>
+    </style>
+
+    <style name="TextViewStyleListItemBold">
+        <item name="android:textSize">15.0sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/grey333</item>
+    </style>
+
+    <style name="TextViewStyleCheckinListItemLineShout">
+        <item name="android:textSize">13.0sp</item>
+        <item name="android:textColor">@color/grey333</item>
+    </style>
+
+    <style name="TextViewStyleCheckinListItemLineTimestamp">
+        <item name="android:textSize">13.0sp</item>
+        <item name="android:textColor">@color/grey999</item>
+    </style>
+
+    <style name="TextViewStyleCheckinListItemLineTimestampAndAppName">
+        <item name="android:textSize">13.0sp</item>
+        <item name="android:textColor">@color/grey999</item>
+    </style>
+
+    <style name="TextViewStyleTipListItemTip">
+        <item name="android:textSize">15.0sp</item>
+        <item name="android:textColor">@color/black_end</item>
+    </style>
+
+    <style name="TextViewStyleTipListItemSignature">
+        <item name="android:textSize">13.0sp</item>
+        <item name="android:textColor">@color/grey_end</item>
+    </style>
+
+    <style name="TextViewStyleUserDetailsActivityTitle">
+        <item name="android:textSize">20.0sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@android:color/black</item>
+    </style>
+
+    <style name="TextViewStyleUserDetailsActivityLastSeen">
+        <item name="android:textSize">14.0sp</item>
+        <item name="android:textColor">@android:color/black</item>
+    </style>
+
+    <style name="TextViewStyleUserDetailsActivityGeneralTitle">
+        <item name="android:textSize">11.0sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">#ff000000</item>
+    </style>
+
+    <style name="TextViewStyleUserDetailsActivityGeneralValue">
+        <item name="android:textSize">18.0sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">#ff000000</item>
+    </style>
+
+    <style name="TextViewStyleTipActivityTitle">
+        <item name="android:textSize">16.0sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="TextViewStyleAddVenueHomePermission">
+        <item name="android:textSize">13.0dip</item>
+        <item name="android:textColor">@color/black_end</item>
+    </style>
+
+    <style name="TextViewStyleVenueNameListItem">
+        <item name="android:textSize">15.0sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/black_end</item>
+    </style>
+
+    <style name="TextViewStyleVenueAddressListItem">
+        <item name="android:textSize">13.0sp</item>
+        <item name="android:textColor">@color/black_end</item>
+    </style>
+
+    <style name="checkinShoutText" parent="@android:style/Widget.EditText">
+        <item name="android:gravity">top</item>
+    </style>
+
+    <style name="checkinShoutCountText" parent="@android:style/Widget.TextView">
+        <item name="android:layout_marginBottom">10.0dip</item>
+        <item name="android:layout_alignParentBottom">true</item>
+    </style>
+
+    <style name="TextViewStyleAddTipTodoActivityNormal">
+        <item name="android:textSize">14.0sp</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="TextViewStyleCheckinYesNoButtons">
+        <item name="android:textSize">13.0sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="greenButton">
+        <item name="android:textSize">18.0sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:background">@drawable/add_comment_btn_selector</item>
+        <item name="android:padding">5.0dip</item>
+        <item name="android:shadowColor">#ff89ba00</item>
+        <item name="android:shadowDx">0.0</item>
+        <item name="android:shadowDy">-1.0</item>
+        <item name="android:shadowRadius">1.0</item>
+    </style>
+
+    <style name="TextViewStyleCheckinResultEmbossed">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:shadowColor">#ff89ba00</item>
+        <item name="android:shadowDx">-1.0</item>
+        <item name="android:shadowDy">-1.0</item>
+        <item name="android:shadowRadius">1.0</item>
+    </style>
+
+    <style name="TextViewStyleListItemActivityButtons">
+        <item name="android:textSize">14.0sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:shadowColor">#ff89ba00</item>
+        <item name="android:shadowDx">0.0</item>
+        <item name="android:shadowDy">-1.0</item>
+        <item name="android:shadowRadius">1.0</item>
+    </style>
+    <style name="TextViewBold">
+        <item name="android:textStyle">bold</item>
+    </style>
+
+</resources>

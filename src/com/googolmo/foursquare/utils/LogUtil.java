@@ -4,19 +4,19 @@ import android.util.Log;
 
 public class LogUtil {
 
-	private final String tag;
+	private String mTag;
 
 	public static LogUtil getLog(String name) {
 		return new LogUtil(name);
 	}
 
 	public LogUtil(String name) {
-		this.tag = name.getClass().getName();
+		this.mTag = name;
 	}
 
 	public void debug(String msg) {
 		if (Configuration.getisDebug()) {
-			Log.d(this.tag, msg);
+			Log.d(this.mTag, msg);
 		}
 	}
 
@@ -25,7 +25,7 @@ public class LogUtil {
 	}
 
 	public void error(String msg) {
-		Log.e(this.tag, msg);
+		Log.e(this.mTag, msg);
 	}
 
 	public void error(int msg) {
@@ -33,7 +33,7 @@ public class LogUtil {
 	}
 
 	public void error(String msg, Throwable tr) {
-		Log.e(this.tag, msg, tr);
+		Log.e(this.mTag, msg, tr);
 	}
 
 	public void error(int msg, Throwable tr) {
@@ -41,7 +41,7 @@ public class LogUtil {
 	}
 
 	public void info(String msg) {
-		Log.i(this.tag, msg);
+		Log.i(this.mTag, msg);
 	}
 
 	public void inof(int msg) {
@@ -49,7 +49,7 @@ public class LogUtil {
 	}
 
 	public void warn(String msg) {
-		Log.w(this.tag, msg);
+		Log.w(this.mTag, msg);
 	}
 
 	public void warn(int msg) {
@@ -57,7 +57,7 @@ public class LogUtil {
 	}
 
 	public void warn(String msg, Throwable tr) {
-		Log.w(this.tag, msg, tr);
+		Log.w(this.mTag, msg, tr);
 	}
 
 	public void warn(int msg, Throwable tr) {

@@ -3,8 +3,34 @@
 
     <string name="hello">Hello World, mainActivity!</string>
     <string name="app_name">4sqCheckIn</string>
-    
+
     <!-- main -->
     <string name="button_oauth_text">OAuth</string>
+    <string name="marsbot">marsbot</string>
+    <string name="location_no_network_provider">"For better results, turn on wireless networks in 'Settings'"</string>
+    <string name="meters">meters</string>
+    <string name="refresh">refresh</string>
+    <string name="configure">configure</string>
+    <string name="what_are_you_up_to">What are you up to?</string>
+    <string name="checkin_or_shout_gather_info_activity_share_with_friends">Share with friends?</string>
+    <string name="checkin_or_shout_gather_info_activity_share_with_followers">Share with followers?</string>
+    <string name="checkin_or_shout_gather_info_activity_share_with_other">Share with…</string>
+    <string name="share_with_facebook_description">Share with Facebook</string>
+    <string name="share_with_twitter_description">Share with Twitter</string>
+    <string name="checkin_action_label">Check In Here</string>
+    <string name="checkin_action_label_checked_in">"You're Checked In Here!"</string>
+    <string name="checkin_result_dialog_badges">Badges</string>
+    <string name="checkin_result_dialog_score_total">Total for this check-in:</string>
+    <string name="checkin_points">Points</string>
+    <string name="checkin_score">Your Check-in score</string>
+    <string name="checkin_specials">Specials</string>
+    <string name="checkin_specials_nearby">Nearby Places that have Specials</string>
+    <string name="checkin_leaderboard">Leaderboard</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="done">Done</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="mayor_header">Mayor</string>
 
 </resources>

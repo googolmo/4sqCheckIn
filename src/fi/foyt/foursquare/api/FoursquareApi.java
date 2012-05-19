@@ -67,7 +67,7 @@ import fi.foyt.foursquare.api.io.Response;
  */
 public class FoursquareApi {
 
-	private static final String DEFAULT_VERSION = "20120321";
+	private static final String DEFAULT_VERSION = "20110623";
 
 	/**
 	 * Constructor.
@@ -2235,6 +2235,7 @@ public class FoursquareApi {
 						urlBuilder.append('=');
 						urlBuilder.append(URLEncoder.encode(value.toString(),
 								"UTF-8"));
+						// urlBuilder.append(value.toString());
 						urlBuilder.append('&');
 					}
 
