@@ -33,4 +33,10 @@
     <string name="no">No</string>
     <string name="mayor_header">Mayor</string>
 
+    <string name="checkin_text">Whar are you up to?</string>
+    <string name="checkin_sharewithfriend">Share with friends?</string>
+    <string name="checkin_sharewithtwitter">Share with twitter</string>
+    <string name="checkin_sharewithfb">Share with Facebook</string>
+
+
 </resources>

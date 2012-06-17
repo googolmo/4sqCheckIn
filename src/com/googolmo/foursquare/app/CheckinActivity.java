@@ -4,335 +4,227 @@
 package com.googolmo.foursquare.app;
 
 import android.app.ProgressDialog;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
+import android.os.*;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.*;
 
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
 import com.googolmo.foursquare.BaseActivity;
 import com.googolmo.foursquare.CheckInApplication;
+import com.googolmo.foursquare.Constants;
 import com.googolmo.foursquare.R;
 import com.googolmo.foursquare.utils.LogUtil;
 
 import fi.foyt.foursquare.api.FoursquareApiException;
 import fi.foyt.foursquare.api.Result;
+import fi.foyt.foursquare.api.ResultMeta;
 import fi.foyt.foursquare.api.entities.Checkin;
+import fi.foyt.foursquare.api.entities.CompactVenue;
+import fi.foyt.foursquare.api.entities.CompleteVenue;
 import fi.foyt.foursquare.api.entities.VenuesSearchResult;
+
+import java.util.ArrayList;
 
 /**
  * @author googolmo
  * 
  */
-public class CheckinActivity extends BaseActivity {
+public class CheckinActivity extends SherlockActivity {
 
-	private LogUtil log = new LogUtil(CheckinActivity.class.getName());
+	private LogUtil mLog = new LogUtil(CheckinActivity.class.getName());
 
-	private EditText mEditTextShout;
-	private TextView mShoutCharactersLeft;
-	private Button mBtnShareWithFriendsYes;
-	private Button mBtnShareWithFriendsNo;
-	private Button mBtnShareFacebook;
-	private Button mBtnShareTwitter;
-	private Button mBtnCheckin;
+    private ActionBar mActionBar;
+    private EditText mEditText_Shout;
+    private Switch mSwitch_ShareFriends;
+    private Switch mSwitch_ShareTwitter;
+    private Switch mSwitch_ShareFB;
+    private CheckBox mCB_ShareFriends;
+    private CheckBox mCB_ShareTwitter;
+    private CheckBox mCB_ShareFB;
+    private CompactVenue mVenue;
+//    private String mVenueID;
 
-	private ProgressDialog mProgressDialog;
+    private boolean mShareFriends;
+    private boolean  mShareTwitter;
+    private boolean mShareFB;
+    private ProgressDialog mDialog;
 
-	private boolean mIsShared;
-	private boolean mIsSharedFB;
-	private boolean mIsSharedTwitter;
+    private CheckinAsyncTask mCheckinAsyncTask;
+    private ArrayList<CheckinAsyncTask> mAsyncTaskList;
 
-	private Bundle mBundle;
-	private String mVenueId;
-	private String mVenueName;
-	private String mVenueLL;
 
-	private Thread mThread;
-
-	@Override
+    @Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.checkin_or_shout_gather_info_activity);
-		this.initData();
-		setupView();
-		setTitle(mVenueName);
+        setContentView(R.layout.act_checkin);
+
+        mActionBar = getSupportActionBar();
+
+        mShareFriends = true;
+        mShareTwitter = true;
+        mShareFB = true;
+
+        this.setupView();
+
+        try {
+            mVenue = (CompactVenue)getIntent().getSerializableExtra("venue");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+        mLog.debug("================================" + mVenue.getId());
+        mAsyncTaskList = new ArrayList<CheckinAsyncTask>();
 
 	}
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        menu.add(Menu.FIRST, Menu.FIRST, Menu.FIRST, "Check in")
+                .setIcon(R.drawable.ic_action_send)
+                .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM|MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(item.getItemId() == Menu.FIRST) {
+            doCheckin();
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
 	private void setupView() {
-		mEditTextShout = (EditText) findViewById(R.id.editTextShout);
-		mShoutCharactersLeft = (TextView) findViewById(R.id.shoutCharactersLeft);
-		mBtnShareWithFriendsYes = (Button) findViewById(R.id.btnShareWithFriendsYes);
-		mBtnShareWithFriendsNo = (Button) findViewById(R.id.btnShareWithFriendsNo);
-		mBtnShareFacebook = (Button) findViewById(R.id.btnShareFacebook);
-		mBtnShareTwitter = (Button) findViewById(R.id.btnShareTwitter);
-		mBtnCheckin = (Button) findViewById(R.id.btnCheckin);
+        mEditText_Shout = (EditText)findViewById(R.id.checkin_edittext);
+        if (Build.VERSION.SDK_INT >= 14) {
+            mSwitch_ShareFriends = (Switch)findViewById(R.id.checkin_share_friends_switch);
+            mSwitch_ShareTwitter = (Switch)findViewById(R.id.checkin_share_twitter_switch);
+            mSwitch_ShareFB = (Switch)findViewById(R.id.checkin_share_fb_switch);
+            mSwitch_ShareFriends.setChecked(true);
+            mSwitch_ShareTwitter.setChecked(true);
+            mSwitch_ShareFB.setChecked(true);
 
-		mBtnShareWithFriendsYes.setOnTouchListener(mShareOnTouchListener);
-		mBtnShareWithFriendsNo.setOnTouchListener(mShareOnTouchListener);
-		mBtnShareFacebook.setOnTouchListener(mShareOnTouchListener);
-		mBtnShareTwitter.setOnTouchListener(mShareOnTouchListener);
+            mSwitch_ShareFriends.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    if (!isChecked) {
+                        mShareFriends = false;
+                        mSwitch_ShareTwitter.setEnabled(false);
+                        mSwitch_ShareFB.setEnabled(false);
+                    } else {
+                        mShareFriends = true;
+                        mSwitch_ShareTwitter.setEnabled(true);
+                        mSwitch_ShareFB.setEnabled(true);
+                    }
+                }
+            });
+            mSwitch_ShareTwitter.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    mShareTwitter = isChecked;
+                }
+            });
+            mSwitch_ShareFB.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    mShareFB = isChecked;
+                }
+            });
+        } else {
+            mCB_ShareFriends = (CheckBox)findViewById(R.id.checkin_share_friends_cb);
+            mCB_ShareTwitter = (CheckBox)findViewById(R.id.checkin_share_twitter_cb);
+            mCB_ShareFB = (CheckBox)findViewById(R.id.checkin_share_fb_cb);
+            mCB_ShareFriends.setChecked(true);
+            mCB_ShareTwitter.setChecked(true);
+            mCB_ShareFB.setChecked(true);
 
-		// mBtnShareWithFriendsYes.setOnClickListener(mShareOnClickListener);
-		// mBtnShareWithFriendsNo.setOnClickListener(mShareOnClickListener);
-		// mBtnShareFacebook.setOnClickListener(mShareOnClickListener);
-		// mBtnShareTwitter.setOnClickListener(mShareOnClickListener);
+            mCB_ShareFriends.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    if (!isChecked) {
+                        mShareFriends = false;
+                        mCB_ShareTwitter.setEnabled(false);
+                        mCB_ShareFB.setEnabled(false);
+                    } else {
+                        mShareFriends = true;
+                        mCB_ShareTwitter.setEnabled(true);
+                        mCB_ShareFB.setEnabled(true);
+                    }
+                }
+            });
 
-		mBtnCheckin.setOnClickListener(mCheckInOnClickListener);
+            mCB_ShareTwitter.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    mShareTwitter = isChecked;
+                }
+            });
 
-		setShareWithFriends(true);
-		mBtnShareFacebook.setBackgroundResource(R.drawable.modal_fb_on);
-		mBtnShareTwitter.setBackgroundResource(R.drawable.modal_twitter_on);
+            mCB_ShareFB.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    mShareFB = isChecked;
+                }
+            });
+        }
 	}
 
-	private void initData() {
-		mBundle = getIntent().getExtras().getBundle("bundle");
-		this.mVenueId = mBundle.getString("venueId");
-		this.mVenueName = mBundle.getString("venueName");
-		this.mVenueLL = mBundle.getDouble("lat") + ","
-				+ mBundle.getDouble("lng");
-		log.debug(mVenueLL);
+//	private void initData() {
+//		mBundle = getIntent().getExtras().getBundle("bundle");
+//		this.mVenueId = mBundle.getString("venueId");
+//		this.mVenueName = mBundle.getString("venueName");
+//		this.mVenueLL = mBundle.getDouble("lat") + ","
+//				+ mBundle.getDouble("lng");
+//		log.debug(mVenueLL);
+//
+//		mIsShared = true;
+//		mIsSharedFB = true;
+//		mIsSharedTwitter = true;
+//	}
 
-		mIsShared = true;
-		mIsSharedFB = true;
-		mIsSharedTwitter = true;
-	}
 
-	private View.OnTouchListener mShareOnTouchListener = new View.OnTouchListener() {
 
-		@Override
-		public boolean onTouch(View v, MotionEvent event) {
-			if (v.getId() == mBtnShareWithFriendsYes.getId()) {
-				switch (event.getAction()) {
-				case MotionEvent.ACTION_DOWN:
-					mBtnShareWithFriendsYes
-							.setBackgroundResource(R.drawable.yes_toggle_pressed);
-					break;
-				case MotionEvent.ACTION_UP:
-				case MotionEvent.ACTION_POINTER_UP:
-				case MotionEvent.ACTION_MASK:
-					setShareWithFriends(true);
-					break;
 
-				}
-			} else if (v.getId() == mBtnShareWithFriendsNo.getId()) {
-				switch (event.getAction()) {
-				case MotionEvent.ACTION_DOWN:
-					mBtnShareWithFriendsNo
-							.setBackgroundResource(R.drawable.no_toggle_pressed);
-					break;
-				case MotionEvent.ACTION_UP:
-				case MotionEvent.ACTION_POINTER_UP:
-				case MotionEvent.ACTION_MASK:
-					setShareWithFriends(false);
-					break;
-				}
-			} else if (v.getId() == mBtnShareFacebook.getId() && mIsShared) {
-				switch (event.getAction()) {
-				case MotionEvent.ACTION_DOWN:
-					mBtnShareFacebook
-							.setBackgroundResource(R.drawable.modal_fb_pressed);
-					break;
-				case MotionEvent.ACTION_UP:
-				case MotionEvent.ACTION_POINTER_UP:
-				case MotionEvent.ACTION_MASK:
-					setShareFB();
-					break;
-				}
-			} else if (v.getId() == mBtnShareTwitter.getId() && mIsShared) {
-				switch (event.getAction()) {
-				case MotionEvent.ACTION_DOWN:
-					mBtnShareTwitter
-							.setBackgroundResource(R.drawable.modal_twitter_pressed);
-					break;
-				case MotionEvent.ACTION_UP:
-				case MotionEvent.ACTION_POINTER_UP:
-				case MotionEvent.ACTION_MASK:
-					setShareTwitter();
-					break;
-				}
-			}
-			return false;
-		}
-	};
 
-	// private View.OnClickListener mShareOnClickListener = new
-	// View.OnClickListener() {
-	//
-	// @Override
-	// public void onClick(View v) {
-	// if (v.getId() == mBtnShareWithFriendsYes.getId()) {
-	//
-	// setShareWithFriends(true);
-	//
-	// } else if (v.getId() == mBtnShareWithFriendsNo.getId()) {
-	//
-	// setShareWithFriends(false);
-	//
-	// } else if (v.getId() == mBtnShareFacebook.getId() && mIsShared) {
-	//
-	// setShareFB();
-	//
-	// } else if (v.getId() == mBtnShareTwitter.getId() && mIsShared) {
-	//
-	// setShareTwitter();
-	// }
-	//
-	// }
-	// };
+    private void doCheckin() {
+        mCheckinAsyncTask = new CheckinAsyncTask();
+        mCheckinAsyncTask.execute();
+        mAsyncTaskList.add(mCheckinAsyncTask);
+    }
 
-	private View.OnClickListener mCheckInOnClickListener = new View.OnClickListener() {
+    private String getBoradcastString() {
+        String value = "public";
+        if (mShareFriends == false) {
+            value = "private";
+        } else {
+            if (mShareTwitter) {
+                value += ",twitter";
+            }
+            if (mShareFB) {
+                value += ",facebook";
+            }
+        }
+        return value;
+    }
 
-		@Override
-		public void onClick(View v) {
-			mProgressDialog = new ProgressDialog(CheckinActivity.this);
-			mProgressDialog.setMessage("checkin");
-			mProgressDialog.show();
+    private void doAfterSuccess(Checkin result) {
+        //Toast.makeText(this, result.getSource().getName(), Toast.LENGTH_SHORT).show();
+        this.finish();
+    }
 
-			mThread = new Thread(mCheckinRunnable);
-			mThread.start();
-		}
-	};
-
-	private void setShareWithFriends(boolean value) {
-		if (value) {
-			mBtnShareWithFriendsYes
-					.setBackgroundResource(R.drawable.yes_toggle_on);
-			mBtnShareWithFriendsNo
-					.setBackgroundResource(R.drawable.no_toggle_off);
-			if (mIsSharedFB) {
-				mBtnShareFacebook.setBackgroundResource(R.drawable.modal_fb_on);
-			} else {
-				mBtnShareFacebook
-						.setBackgroundResource(R.drawable.modal_fb_off);
-			}
-
-			if (mIsSharedTwitter) {
-				mBtnShareTwitter
-						.setBackgroundResource(R.drawable.modal_twitter_on);
-			} else {
-				mBtnShareTwitter
-						.setBackgroundResource(R.drawable.modal_twitter_off);
-			}
-		} else {
-			mBtnShareWithFriendsYes
-					.setBackgroundResource(R.drawable.yes_toggle_off);
-			mBtnShareWithFriendsNo
-					.setBackgroundResource(R.drawable.no_toggle_on);
-			mBtnShareFacebook
-					.setBackgroundResource(R.drawable.modal_fb_disabled);
-			mBtnShareTwitter
-					.setBackgroundResource(R.drawable.modal_twitter_disabled);
-			mIsSharedFB = false;
-			mIsSharedTwitter = false;
-		}
-		mIsShared = value;
-	}
-
-	private void setShareFB() {
-		boolean value = mIsSharedFB;
-		if (!value) {
-			mBtnShareFacebook.setBackgroundResource(R.drawable.modal_fb_on);
-
-		} else {
-			mBtnShareFacebook.setBackgroundResource(R.drawable.modal_fb_off);
-		}
-		mIsSharedFB = !value;
-	}
-
-	private void setShareTwitter() {
-		boolean value = mIsSharedTwitter;
-		if (!value) {
-			mBtnShareTwitter.setBackgroundResource(R.drawable.modal_twitter_on);
-		} else {
-			mBtnShareTwitter
-					.setBackgroundResource(R.drawable.modal_twitter_off);
-		}
-		mIsSharedTwitter = !value;
-	}
-
-	private String getBroadcastString() {
-		String value = "public";
-		if (!mIsShared) {
-			value = "private";
-		} else {
-			value = "public";
-			if (mIsSharedFB) {
-				value += ",facebook";
-			}
-			if (mIsSharedTwitter) {
-				value += ",twitter";
-			}
-		}
-		return value;
-	}
-
-	public Runnable mCheckinRunnable = new Runnable() {
-
-		@Override
-		public void run() {
-			Message message = mHandler.obtainMessage();
-			try {
-
-				String shout = null;
-
-				if (mEditTextShout.getText().toString().length() > 0) {
-					shout = mEditTextShout.getText().toString();
-				}
-
-				Result<Checkin> result = ((CheckInApplication) getApplication())
-						.getApi().checkinsAdd(mVenueId, null, shout,
-								getBroadcastString(), mVenueLL, null, null,
-								null);
-				if (result.getMeta().getCode() == 200) {
-					log.debug("成功:" + result.getMeta().getCode());
-					message.what = 1;
-					message.obj = result;
-				} else {
-					log.debug("失败:" + result.getMeta().getCode());
-					message.what = 2;
-					message.obj = result.getMeta().getErrorDetail();
-				}
-			} catch (FoursquareApiException e) {
-				message.what = 0;
-				message.obj = e.getMessage();
-				e.printStackTrace();
-			}
-			mHandler.sendMessage(message);
-
-		}
-	};
-
-	private Handler mHandler = new Handler() {
-
-		@Override
-		public void handleMessage(Message msg) {
-			mProgressDialog.cancel();
-			switch (msg.what) {
-			case 0:
-			case 2:
-				log.debug(msg.obj.toString());
-				Toast.makeText(CheckinActivity.this, msg.obj.toString(),
-						Toast.LENGTH_LONG).show();
-				break;
-			case 1:
-				log.debug("成功");
-				Toast.makeText(CheckinActivity.this, "成功!", Toast.LENGTH_SHORT)
-						.show();
-
-				//
-				finish();
-				// updateListView((Result<VenuesSearchResult>) msg.obj);
-				break;
-			}
-			super.handleMessage(msg);
-		}
-
-	};
+    private void doAfterError(ResultMeta error){
+        //TODO
+        if (error == null) {
+            //TODO
+        } else {
+            Toast.makeText(this, error.getErrorDetail(), Toast.LENGTH_SHORT).show();
+        }
+    }
 
 	@Override
 	protected void onPause() {
@@ -357,5 +249,74 @@ public class CheckinActivity extends BaseActivity {
 		// TODO Auto-generated method stub
 		super.onStop();
 	}
+
+    private class CheckinAsyncTask extends AsyncTask<Void,Void,Result<Checkin>> {
+
+
+        @Override
+        protected Result<Checkin> doInBackground(Void... params) {
+            try {
+                String shout = null;
+                if (mEditText_Shout.getText().toString().length() > 0) {
+                    shout = mEditText_Shout.getText().toString();
+                }
+                return ((CheckInApplication)getApplication()).getApi().checkinsAdd(mVenue.getId(), null, shout, getBoradcastString(),
+                        mVenue.getLocation().getLat() + "," + mVenue.getLocation().getLng(), null, null, null);
+
+            } catch (FoursquareApiException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            if (mDialog == null) {
+                mDialog = new ProgressDialog(CheckinActivity.this);
+                mDialog.setCancelable(false);
+            }
+            if (mDialog.isShowing()) {
+                mDialog.dismiss();
+            }
+            mDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            mDialog.setMessage("正在提交...");
+            mDialog.show();
+
+
+
+        }
+
+        @Override
+        protected void onPostExecute(Result<Checkin> checkinResult) {
+            super.onPostExecute(checkinResult);
+            mDialog.cancel();
+            if (checkinResult == null) {
+                doAfterError(null);
+            } else {
+                if (checkinResult.getMeta().getCode() == 200) {
+                    doAfterSuccess(checkinResult.getResult());
+                } else {
+                    doAfterError(checkinResult.getMeta());
+                }
+            }
+
+        }
+
+        @Override
+        protected void onProgressUpdate(Void... values) {
+            super.onProgressUpdate(values);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        for (CheckinAsyncTask task : mAsyncTaskList) {
+            if (task.getStatus() == AsyncTask.Status.RUNNING) {
+                task.cancel(true);
+            }
+        }
+    }
 
 }

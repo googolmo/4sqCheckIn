@@ -25,11 +25,11 @@ import org.json.JSONTokener;
 
 /**
  * Used to intercept and handle the responses from requests made using 
- * {@link AsyncHttpClient}, with automatic parsing into a {@link JSONObject}
- * or {@link JSONArray}.
+ * {@link AsyncHttpClient}, with automatic parsing into a {@link org.json.JSONObject}
+ * or {@link org.json.JSONArray}.
  * <p>
  * This class is designed to be passed to get, post, put and delete requests
- * with the {@link #onSuccess(JSONObject)} or {@link #onSuccess(JSONArray)}
+ * with the {@link #onSuccess(org.json.JSONObject)} or {@link #onSuccess(org.json.JSONArray)}
  * methods anonymously overridden.
  * <p>
  * Additionally, you can override the other event methods from the 
@@ -71,7 +71,7 @@ public class JsonHttpResponseHandler extends AsyncHttpResponseHandler {
                 onSuccess((JSONArray)jsonResponse);
             }
         } catch(JSONException e) {
-            onFailure(e, responseBody);
+            onFailure(e);
         }
     }
 

@@ -3,10 +3,15 @@
  */
 package com.googolmo.foursquare;
 
+import android.os.AsyncTask;
+import android.os.Bundle;
 import com.googolmo.foursquare.app.OAuthAcitivity;
 
 import android.app.Activity;
 import android.content.Intent;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author googolmo
@@ -14,7 +19,27 @@ import android.content.Intent;
  */
 public class BaseActivity extends Activity {
 
-	@Override
+    public List<AsyncTask> mTaskList = new ArrayList<AsyncTask>();
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        this.mTaskList.clear();
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (this.mTaskList != null) {
+            for (AsyncTask task : mTaskList) {
+                if (! task.getStatus().equals(AsyncTask.Status.FINISHED)) {
+                    task.cancel(true);
+                }
+            }
+        }
+        super.onDestroy();
+    }
+
+    @Override
 	protected void onStart() {
 		// TODO Auto-generated method stub
 		super.onStart();

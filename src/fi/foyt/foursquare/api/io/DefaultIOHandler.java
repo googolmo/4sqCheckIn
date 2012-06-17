@@ -20,8 +20,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import com.googolmo.foursquare.R.color;
-
 /**
  * Default implementation of the IOHandler
  * 
@@ -29,6 +27,8 @@ import com.googolmo.foursquare.R.color;
  * 
  */
 public class DefaultIOHandler extends IOHandler {
+
+    private static final int DEFAULT_SOCKET_TIMEOUT = 10 * 1000;
 
 	@Override
 	public Response fetchData(String url, Method method) {
@@ -41,13 +41,14 @@ public class DefaultIOHandler extends IOHandler {
 					.openConnection();
 			try {
 				connection.setRequestMethod(method.name());
-				// connection
-				// .setRequestProperty("Accept-Charset", "UTF-8,*;q=0.5");
+				connection.setRequestProperty("Accept-Charset", "UTF-8,*;q=0.5");
 				connection.addRequestProperty("User-Agent", "GoogolMo");
 				// connection.setRequestProperty("X-HostCommonName",
 				// "api.foursquare.com");
 				connection.setRequestProperty("X-Target-URI",
 						"https://api.foursquare.com");
+                connection.setConnectTimeout(DEFAULT_SOCKET_TIMEOUT);
+                connection.setReadTimeout(DEFAULT_SOCKET_TIMEOUT);
 				connection.setDoInput(true);
 				if (method.name().equals(Method.POST)) {
 					connection.setRequestProperty("Content-Type",
@@ -90,6 +91,8 @@ public class DefaultIOHandler extends IOHandler {
 				connection.setDoInput(true);
 				connection.setDoOutput(true);
 				connection.setRequestMethod("POST");
+                connection.setConnectTimeout(DEFAULT_SOCKET_TIMEOUT);
+                connection.setReadTimeout(DEFAULT_SOCKET_TIMEOUT);
 				connection.setRequestProperty("Content-Type",
 						"multipart/form-data; boundary=" + BOUNDARY);
 				connection.connect();

@@ -36,12 +36,12 @@ import android.text.TextUtils;
 
 /**
  * A persistent cookie store which implements the Apache HttpClient
- * {@link CookieStore} interface. Cookies are stored and will persist on the
+ * {@link org.apache.http.client.CookieStore} interface. Cookies are stored and will persist on the
  * user's device between application sessions since they are serialized and
- * stored in {@link SharedPreferences}.
+ * stored in {@link android.content.SharedPreferences}.
  * <p>
  * Instances of this class are designed to be used with
- * {@link AsyncHttpClient#setCookieStore}, but can also be used with a 
+ * {@link AsyncHttpClient#setCookieStore}, but can also be used with a
  * regular old apache HttpClient/HttpContext if you prefer.
  */
 public class PersistentCookieStore implements CookieStore {
@@ -82,12 +82,8 @@ public class PersistentCookieStore implements CookieStore {
     public void addCookie(Cookie cookie) {
         String name = cookie.getName();
 
-        // Save cookie into local store, or remove if expired
-        if(!cookie.isExpired(new Date())) {
-            cookies.put(name, cookie);
-        } else {
-            cookies.remove(name);
-        }
+        // Save cookie into local store
+        cookies.put(name, cookie);
 
         // Save cookie into persistent store
         SharedPreferences.Editor prefsWriter = cookiePrefs.edit();

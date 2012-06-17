@@ -3,6 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/4sqCheckIn.iml" filepath="$PROJECT_DIR$/4sqCheckIn.iml" />
+      <module fileurl="file://$PROJECT_DIR$/gen-external-apklibs/~apklib-com.actionbarsherlock_library_4.1.0.iml" filepath="$PROJECT_DIR$/gen-external-apklibs/~apklib-com.actionbarsherlock_library_4.1.0.iml" />
+      <module fileurl="file://$PROJECT_DIR$/gen-external-apklibs/~apklib-com.viewpagerindicator_library_2.3.1.iml" filepath="$PROJECT_DIR$/gen-external-apklibs/~apklib-com.viewpagerindicator_library_2.3.1.iml" />
     </modules>
   </component>
 </project>

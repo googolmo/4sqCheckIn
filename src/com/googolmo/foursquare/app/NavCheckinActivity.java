@@ -3,36 +3,30 @@
  */
 package com.googolmo.foursquare.app;
 
-import java.net.ContentHandler;
+import java.util.ArrayList;
+import java.util.List;
 
 import android.content.Context;
 import android.content.Intent;
-import android.database.DataSetObserver;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
-import android.view.LayoutInflater;
+import android.support.v4.app.Fragment;
+import android.view.*;
 import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Adapter;
-import android.widget.AdapterView;
-import android.widget.BaseAdapter;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.ListView;
-import android.widget.RelativeLayout;
-import android.widget.ScrollView;
-import android.widget.TextView;
+import android.view.MenuInflater;
+import android.widget.*;
 
-import com.googolmo.foursquare.BaseActivity;
+import com.actionbarsherlock.app.SherlockFragment;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.actionbarsherlock.view.*;
+import com.actionbarsherlock.view.MenuItem;
 import com.googolmo.foursquare.CheckInApplication;
+import com.googolmo.foursquare.Constants;
 import com.googolmo.foursquare.R;
+import com.googolmo.foursquare.utils.AsyncImageLoader;
 import com.googolmo.foursquare.utils.LogUtil;
 
 import fi.foyt.foursquare.api.FoursquareApiException;
@@ -44,7 +38,7 @@ import fi.foyt.foursquare.api.entities.VenuesSearchResult;
  * @author googolmo
  * 
  */
-public class NavCheckinActivity extends BaseActivity {
+public class NavCheckinActivity extends SherlockFragment {
 
 	LogUtil log = LogUtil.getLog(NavCheckinActivity.class.getName());
 
@@ -58,29 +52,50 @@ public class NavCheckinActivity extends BaseActivity {
 	private LocationManager mLocationManager;
 	private Location mLocation;
 
-	private Thread mThread;
+	private List<AsyncTask> mTaskList = new ArrayList<AsyncTask>();
 
 	private static final int TWO_MINUTES = 1000 * 60 * 2;
 
+    private static NavCheckinActivity fragment;
+
+    public static NavCheckinActivity getinstance(){
+         if (fragment == null) {
+             fragment = new NavCheckinActivity();
+         }
+        return fragment;
+    }
+
+
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
+	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.nav_checkin);
+//        setContentView(R.layout.nav_checkin);
+        mTaskList.clear();
+        setHasOptionsMenu(true);
 		log.debug("onCreate");
-		this.setupView();
-		mViewNoLocationProviders.setVisibility(View.GONE);
-		mVenueListView.setVisibility(View.GONE);
-		this.getLocation();
+
 
 	}
 
-	private void setupView() {
-		mViewNetworkProviderOff = (LinearLayout) findViewById(R.id.viewNetworkProviderOff);
-		mViewListview = (LinearLayout) findViewById(R.id.viewListview);
-		mViewNoLocationProviders = (ScrollView) findViewById(R.id.viewNoLocationProviders);
-		mEmptyLoadingLayout = (LinearLayout) findViewById(R.id.empty_loading_layout);
-		mVenueListView = (ListView) findViewById(R.id.listview);
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        super.onCreateView(inflater, container, savedInstanceState);
+//        container.removeAllViews();
+        View v = inflater.inflate(R.layout.nav_checkin, container, false);
+
+        setupView(v);
+        mViewNoLocationProviders.setVisibility(View.GONE);
+        mVenueListView.setVisibility(View.GONE);
+        this.getLocation();
+        return v;
+    }
+
+    private void setupView(View v) {
+		mViewNetworkProviderOff = (LinearLayout) v.findViewById(R.id.viewNetworkProviderOff);
+		mViewListview = (LinearLayout) v.findViewById(R.id.viewListview);
+		mViewNoLocationProviders = (ScrollView) v.findViewById(R.id.viewNoLocationProviders);
+		mEmptyLoadingLayout = (LinearLayout) v.findViewById(R.id.empty_loading_layout);
+		mVenueListView = (ListView) v.findViewById(R.id.listview);
 	}
 
 	private void getLocation() {
@@ -98,7 +113,7 @@ public class NavCheckinActivity extends BaseActivity {
 		// }
 
 		if (mLocationManager == null) {
-			mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+			mLocationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
 		}
 
 		mLocation = mLocationManager
@@ -126,71 +141,16 @@ public class NavCheckinActivity extends BaseActivity {
 		}
 		mLocationManager.removeUpdates(mLocationListener);
 
-		// new Thread(mVenueRunnable).start();
+        String ll = location.getLatitude() + ","
+                + location.getLongitude();
 
-		if (mThread != null && mThread.isAlive()) {
-			try {
-				mThread.interrupt();
-			} catch (Exception e) {
-				// TODO: handle exception
-			}
+        VenueSearchAsyncTask venueTask = new VenueSearchAsyncTask();
+        venueTask.execute(ll);
 
-		}
-
-		mThread = new Thread(mVenueRunnable);
-		mThread.start();
+        mTaskList.add(venueTask);
 
 	}
 
-	public Runnable mVenueRunnable = new Runnable() {
-
-		@Override
-		public void run() {
-			Message message = mHandler.obtainMessage();
-			try {
-
-				String ll = mLocation.getLatitude() + ","
-						+ mLocation.getLongitude();
-				Result<VenuesSearchResult> lists = ((CheckInApplication) getApplication())
-						.getApi().venuesSearch(ll, null, null, null, null, 50,
-								"checkin", null, null, null, null);
-				if (lists.getMeta().getCode() == 200) {
-					log.debug("成功:" + lists.getMeta().getCode());
-					message.what = 1;
-					message.obj = lists;
-				} else {
-					log.debug("失败:" + lists.getMeta().getCode());
-					message.what = 2;
-					message.obj = lists.getMeta().getErrorDetail();
-				}
-			} catch (FoursquareApiException e) {
-				message.what = 0;
-				message.obj = e.getMessage();
-				e.printStackTrace();
-			}
-			mHandler.sendMessage(message);
-		}
-	};
-
-	private Handler mHandler = new Handler() {
-
-		@SuppressWarnings("unchecked")
-		@Override
-		public void handleMessage(Message msg) {
-			switch (msg.what) {
-			case 0:
-			case 2:
-				log.debug(msg.obj.toString());
-				break;
-			case 1:
-				log.debug("成功");
-				updateListView((Result<VenuesSearchResult>) msg.obj);
-				break;
-			}
-			super.handleMessage(msg);
-		}
-
-	};
 
 	private final LocationListener mLocationListener = new LocationListener() {
 
@@ -293,7 +253,7 @@ public class NavCheckinActivity extends BaseActivity {
 
 		log.debug(result.getResult().getVenues().length);
 
-		VenueAdapter venueAdapter = new VenueAdapter(this, result);
+		VenueAdapter venueAdapter = new VenueAdapter(getActivity(), result);
 		this.mVenueListView.setAdapter(venueAdapter);
 		this.mVenueListView.setVisibility(View.VISIBLE);
 		this.mVenueListView.invalidate();
@@ -307,6 +267,7 @@ public class NavCheckinActivity extends BaseActivity {
 						// result.getResult().getVenues()[arg2]
 						log.debug("click at" + arg2);
 						Bundle bundle = new Bundle();
+
 						bundle.putString("venueId", result.getResult()
 								.getVenues()[arg2].getId());
 						bundle.putString("venueName", result.getResult()
@@ -318,9 +279,10 @@ public class NavCheckinActivity extends BaseActivity {
 								result.getResult().getVenues()[arg2]
 										.getLocation().getLng());
 
-						Intent intent = new Intent(NavCheckinActivity.this,
+						Intent intent = new Intent(getActivity(),
 								CheckinActivity.class);
 						intent.putExtra("bundle", bundle);
+                        intent.putExtra(Constants.KEY_VENUE, result.getResult().getVenues()[arg2]);
 						startActivity(intent);
 					}
 				});
@@ -363,16 +325,10 @@ public class NavCheckinActivity extends BaseActivity {
 		return rst;
 	}
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		menu.add(Menu.NONE, Menu.FIRST, Menu.FIRST, R.string.refresh);
-		menu.add(Menu.NONE, Menu.FIRST + 1, Menu.FIRST + 1, R.string.configure);
-		return super.onCreateOptionsMenu(menu);
-	}
 
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
 		case Menu.FIRST:
 			log.debug("刷新");
 			getLocation();
@@ -381,45 +337,98 @@ public class NavCheckinActivity extends BaseActivity {
 			log.debug("设置");
 			break;
 		}
-		return super.onOptionsItemSelected(item);
-	}
+        return super.onOptionsItemSelected(item);
+    }
 
-	@Override
-	public void finish() {
-		// TODO Auto-generated method stub
-		super.finish();
-	}
+    @Override
+    public void onCreateOptionsMenu(com.actionbarsherlock.view.Menu menu, com.actionbarsherlock.view.MenuInflater inflater) {
+        menu.add(Menu.NONE, Menu.FIRST, Menu.FIRST, R.string.refresh);
+        menu.add(Menu.NONE, Menu.FIRST + 1, Menu.FIRST + 1, R.string.configure);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
 
-	@Override
-	protected void onPause() {
-		// TODO Auto-generated method stub
-		super.onPause();
-		try {
+
+
+//	@Override
+//	public void finish() {
+//		// TODO Auto-generated method stub
+//		super.finish();
+//	}
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        try {
 			mLocationManager.removeUpdates(mLocationListener);
 			// mLocationManagerProxy.removeUpdates(mLocationListener);
 		} catch (Exception e) {
 			log.warn("mLocationManager has removeUpdates");
 		}
+    }
 
-	}
+
+//	@Override
+//	public void onPause() {
+//		// TODO Auto-generated method stub
+//		super.onPause();
+//		try {
+//			mLocationManager.removeUpdates(mLocationListener);
+//			// mLocationManagerProxy.removeUpdates(mLocationListener);
+//		} catch (Exception e) {
+//			log.warn("mLocationManager has removeUpdates");
+//		}
+//
+//	}
+
 
 	@Override
-	protected void onRestart() {
-		// TODO Auto-generated method stub
-		super.onRestart();
-	}
-
-	@Override
-	protected void onResume() {
+	public void onResume() {
 		// TODO Auto-generated method stub
 		super.onResume();
 	}
 
 	@Override
-	protected void onStop() {
+	public void onStop() {
 		// TODO Auto-generated method stub
 		super.onStop();
 	}
+
+    class VenueSearchAsyncTask extends AsyncTask<String, Void, Result<VenuesSearchResult>> {
+
+        @Override
+        protected Result<VenuesSearchResult> doInBackground(String... params) {
+
+            if (params != null && params.length > 0) {
+                try {
+                    return ((CheckInApplication) getActivity().getApplication())
+                            .getApi().venuesSearch(params[0], null, null, null, null, 50,
+                                    "checkin", null, null, null, null);
+                } catch (FoursquareApiException e) {
+                    e.printStackTrace();
+                }
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected void onPostExecute(Result<VenuesSearchResult> result) {
+            if(result != null) {
+                if (result.getMeta().getCode() == 200) {
+                    updateListView(result);
+                } else {
+                    Toast.makeText(getActivity(), result.getMeta().getErrorDetail(), Toast.LENGTH_LONG).show();
+                }
+            } else {
+                Toast.makeText(getActivity(), "出现了点错误!", Toast.LENGTH_LONG).show();
+            }
+            super.onPostExecute(result);
+        }
+    }
 
 	public class VenueAdapter extends BaseAdapter {
 
@@ -515,6 +524,11 @@ public class NavCheckinActivity extends BaseActivity {
 			if (venue.getSpecials() == null || venue.getSpecials().length < 1) {
 				holder.iconSpecialHere.setVisibility(View.GONE);
 			}
+            if (venue.getCategories().length > 0) {
+                String iconUrl = venue.getCategories()[0].getIcon().replace(".png", "_256.png");
+                AsyncImageLoader.loadImage(convertView.getContext(), iconUrl, holder.icon, R.drawable.category_none, true);
+            }
+
 
 			return convertView;
 		}
@@ -534,4 +548,15 @@ public class NavCheckinActivity extends BaseActivity {
 		ImageView venueTodoCorner;
 	}
 
+    @Override
+    public void onDestroy() {
+        if (mTaskList != null) {
+            for (AsyncTask task : mTaskList) {
+                if (!task.getStatus().equals(AsyncTask.Status.FINISHED)) {
+                    task.cancel(true);
+                }
+            }
+        }
+        super.onDestroy();
+    }
 }

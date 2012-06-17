@@ -174,11 +174,8 @@ public class RequestParams {
 
         return result.toString();
     }
- 
-   /**
-     * Returns an HttpEntity containing all request parameters
-     */
-    public HttpEntity getEntity() {
+
+    HttpEntity getEntity() {
         HttpEntity entity = null;
 
         if(!fileParams.isEmpty()) {
@@ -190,19 +187,15 @@ public class RequestParams {
             }
 
             // Add file params
-            int currentIndex = 0;
-            int lastIndex = fileParams.entrySet().size() - 1;
             for(ConcurrentHashMap.Entry<String, FileWrapper> entry : fileParams.entrySet()) {
                 FileWrapper file = entry.getValue();
                 if(file.inputStream != null) {
-                	boolean isLast = currentIndex == lastIndex;
                     if(file.contentType != null) {
-                        multipartEntity.addPart(entry.getKey(), file.getFileName(), file.inputStream, file.contentType, isLast);
+                        multipartEntity.addPart(entry.getKey(), file.getFileName(), file.inputStream, file.contentType);
                     } else {
-                        multipartEntity.addPart(entry.getKey(), file.getFileName(), file.inputStream, isLast);
+                        multipartEntity.addPart(entry.getKey(), file.getFileName(), file.inputStream);
                     }
                 }
-                currentIndex++;
             }
 
             entity = multipartEntity;

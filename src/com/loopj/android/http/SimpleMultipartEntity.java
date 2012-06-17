@@ -93,11 +93,11 @@ class SimpleMultipartEntity implements HttpEntity {
         }
     }
 
-    public void addPart(final String key, final String fileName, final InputStream fin, final boolean isLast){
-        addPart(key, fileName, fin, "application/octet-stream", isLast);
+    public void addPart(final String key, final String fileName, final InputStream fin){
+        addPart(key, fileName, fin, "application/octet-stream");
     }
 
-    public void addPart(final String key, final String fileName, final InputStream fin, String type, final boolean isLast){
+    public void addPart(final String key, final String fileName, final InputStream fin, String type){
         writeFirstBoundaryIfNeeds();
         try {
             type = "Content-Type: "+type+"\r\n";
@@ -110,8 +110,6 @@ class SimpleMultipartEntity implements HttpEntity {
             while ((l = fin.read(tmp)) != -1) {
                 out.write(tmp, 0, l);
             }
-            if(!isLast)
-            	out.write(("\r\n--" + boundary + "\r\n").getBytes());
             out.flush();
         } catch (final IOException e) {
             e.printStackTrace();
@@ -124,9 +122,9 @@ class SimpleMultipartEntity implements HttpEntity {
         }
     }
 
-    public void addPart(final String key, final File value, final boolean isLast) {
+    public void addPart(final String key, final File value) {
         try {
-            addPart(key, value.getName(), new FileInputStream(value), isLast);
+            addPart(key, value.getName(), new FileInputStream(value));
         } catch (final FileNotFoundException e) {
             e.printStackTrace();
         }

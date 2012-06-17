@@ -55,22 +55,16 @@ class AsyncHttpRequest implements Runnable {
         } catch (IOException e) {
             if(responseHandler != null) {
                 responseHandler.sendFinishMessage();
-                responseHandler.sendFailureMessage(e, null);
+                responseHandler.sendFailureMessage(e);
             }
         }
     }
-    
+
     private void makeRequest() throws IOException {
-    	if(!Thread.currentThread().isInterrupted()) {
-    		HttpResponse response = client.execute(request, context);
-    		if(!Thread.currentThread().isInterrupted()) {
-    			if(responseHandler != null) {
-    				responseHandler.sendResponseMessage(response);
-    			}
-    		} else{
-    			//TODO: should raise InterruptedException? this block is reached whenever the request is cancelled before its response is received
-    		}
-    	}
+        HttpResponse response = client.execute(request, context);
+        if(responseHandler != null) {
+            responseHandler.sendResponseMessage(response);
+        }
     }
 
     private void makeRequestWithRetries() throws ConnectException {
@@ -92,7 +86,7 @@ class AsyncHttpRequest implements Runnable {
                 // http://code.google.com/p/android/issues/detail?id=5255
                 cause = new IOException("NPE in HttpClient" + e.getMessage());
                 retry = retryHandler.retryRequest(cause, ++executionCount, context);
-            } 
+            }
         }
 
         // no retries left, crap out with exception

@@ -18,25 +18,26 @@
 
 package com.loopj.android.http;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.apache.http.client.HttpResponseException;
 import org.apache.http.entity.BufferedHttpEntity;
-import org.apache.http.util.EntityUtils;
 
 import android.os.Handler;
-import android.os.Message;
 import android.os.Looper;
+import android.os.Message;
 
 /**
  * Used to intercept and handle the responses from requests made using 
- * {@link AsyncHttpClient}. The {@link #onSuccess(String)} method is 
+ * {@link AsyncHttpClient}. The {@link #onSuccess(String)} method is
  * designed to be anonymously overridden with your own response handling code.
  * <p>
- * Additionally, you can override the {@link #onFailure(Throwable, String)},
+ * Additionally, you can override the {@link #onFailure(Throwable)},
  * {@link #onStart()}, and {@link #onFinish()} methods as required.
  * <p>
  * For example:
@@ -55,7 +56,7 @@ import android.os.Looper;
  *     }
  * 
  *     &#064;Override
- *     public void onFailure(Throwable e, String response) {
+ *     public void onFailure(Throwable e) {
  *         // Response failed :(
  *     }
  *
@@ -110,33 +111,28 @@ public class AsyncHttpResponseHandler {
     public void onSuccess(String content) {}
 
     /**
-     * Fired when a request fails to complete, override to handle in your own code
-     * @param error the underlying cause of the failure
-     * @deprecated use {@link #onFailure(Throwable, String)}
+     * Fired when a request returns successfully, override to handle in your own code
+     * @param content the body of the HTTP response from the server
      */
-    public void onFailure(Throwable error) {}
+    public void onSuccess(byte[] content) {}
 
     /**
      * Fired when a request fails to complete, override to handle in your own code
      * @param error the underlying cause of the failure
-     * @param content the response body, if any
      */
-    public void onFailure(Throwable error, String content) {
-        // By default, call the deprecated onFailure(Throwable) for compatibility
-        onFailure(error);
-    }
+    public void onFailure(Throwable error) {}
 
 
     //
     // Pre-processing of messages (executes in background threadpool thread)
     //
 
-    protected void sendSuccessMessage(String responseBody) {
+    protected void sendSuccessMessage(byte[] responseBody) {
         sendMessage(obtainMessage(SUCCESS_MESSAGE, responseBody));
     }
 
-    protected void sendFailureMessage(Throwable e, String responseBody) {
-        sendMessage(obtainMessage(FAILURE_MESSAGE, new Object[]{e, responseBody}));
+    protected void sendFailureMessage(Throwable e) {
+        sendMessage(obtainMessage(FAILURE_MESSAGE, e));
     }
 
     protected void sendStartMessage() {
@@ -152,32 +148,45 @@ public class AsyncHttpResponseHandler {
     // Pre-processing of messages (in original calling thread, typically the UI thread)
     //
 
+    protected void handleSuccessMessage(byte[] responseBody) {
+        // Call both callback, first with the raw bytes, then as string.
+        onSuccess(responseBody);
+
+        // TODO: use proper charset from content-type as second param to toString()
+        String responseAsString;
+        try {
+            responseAsString = new String(responseBody, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            responseAsString = new String(responseBody);
+        }
+        handleSuccessMessage(responseAsString);
+    }
+
     protected void handleSuccessMessage(String responseBody) {
         onSuccess(responseBody);
     }
 
-    protected void handleFailureMessage(Throwable e, String responseBody) {
-        onFailure(e, responseBody);
+    protected void handleFailureMessage(Throwable e) {
+        onFailure(e);
     }
 
 
 
     // Methods which emulate android's Handler and Message methods
     protected void handleMessage(Message msg) {
-        switch(msg.what) {
-            case SUCCESS_MESSAGE:
-                handleSuccessMessage((String)msg.obj);
-                break;
-            case FAILURE_MESSAGE:
-                Object[] repsonse = (Object[])msg.obj;
-                handleFailureMessage((Throwable)repsonse[0], (String)repsonse[1]);
-                break;
-            case START_MESSAGE:
-                onStart();
-                break;
-            case FINISH_MESSAGE:
-                onFinish();
-                break;
+        switch (msg.what) {
+        case SUCCESS_MESSAGE:
+            handleSuccessMessage((byte[]) msg.obj);
+            break;
+        case FAILURE_MESSAGE:
+            handleFailureMessage((Throwable) msg.obj);
+            break;
+        case START_MESSAGE:
+            onStart();
+            break;
+        case FINISH_MESSAGE:
+            onFinish();
+            break;
         }
     }
 
@@ -205,22 +214,27 @@ public class AsyncHttpResponseHandler {
     // Interface to AsyncHttpRequest
     void sendResponseMessage(HttpResponse response) {
         StatusLine status = response.getStatusLine();
-        String responseBody = null;
-        try {
-            HttpEntity entity = null;
-            HttpEntity temp = response.getEntity();
-            if(temp != null) {
-                entity = new BufferedHttpEntity(temp);
-            }
-            responseBody = EntityUtils.toString(entity);
-        } catch(IOException e) {
-            sendFailureMessage(e, null);
-        }
-
         if(status.getStatusCode() >= 300) {
-            sendFailureMessage(new HttpResponseException(status.getStatusCode(), status.getReasonPhrase()), responseBody);
+            sendFailureMessage(new HttpResponseException(status.getStatusCode(), status.getReasonPhrase()));
         } else {
-            sendSuccessMessage(responseBody);
+            try {
+                HttpEntity entity = null;
+                HttpEntity temp = response.getEntity();
+                if(temp != null) {
+                    entity = new BufferedHttpEntity(temp);
+                }
+
+                // Send response as a byte array and assume listener knows what to expect.
+                ByteArrayInputStream stream = (ByteArrayInputStream) entity.getContent();
+                // Cast long to int. I assume we don't want to send
+                // 2GB+ of data between threads.
+                byte[] contents = new byte[(int) entity.getContentLength()];
+                while (stream.read(contents) != -1) {
+                }
+                sendSuccessMessage(contents);
+            } catch(IOException e) {
+                sendFailureMessage(e);
+            }
         }
     }
 }
