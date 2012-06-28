@@ -80,6 +80,7 @@ public class CheckinActivity extends SherlockActivity {
 
         mLog.debug("================================" + mVenue.getId());
         mAsyncTaskList = new ArrayList<CheckinAsyncTask>();
+        mActionBar.setTitle(mVenue.getName());
 
 	}
 
