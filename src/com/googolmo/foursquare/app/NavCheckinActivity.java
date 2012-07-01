@@ -3,9 +3,6 @@
  */
 package com.googolmo.foursquare.app;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
@@ -13,26 +10,25 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.view.*;
+import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.*;
-
 import com.actionbarsherlock.app.SherlockFragment;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.actionbarsherlock.view.*;
 import com.actionbarsherlock.view.MenuItem;
 import com.googolmo.foursquare.CheckInApplication;
 import com.googolmo.foursquare.Constants;
 import com.googolmo.foursquare.R;
 import com.googolmo.foursquare.utils.AsyncImageLoader;
 import com.googolmo.foursquare.utils.LogUtil;
-
 import fi.foyt.foursquare.api.FoursquareApiException;
 import fi.foyt.foursquare.api.Result;
 import fi.foyt.foursquare.api.entities.CompactVenue;
 import fi.foyt.foursquare.api.entities.VenuesSearchResult;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author googolmo
@@ -40,7 +36,7 @@ import fi.foyt.foursquare.api.entities.VenuesSearchResult;
  */
 public class NavCheckinActivity extends SherlockFragment {
 
-	LogUtil log = LogUtil.getLog(NavCheckinActivity.class.getName());
+	LogUtil mLog = LogUtil.getLog(NavCheckinActivity.class.getName());
 
 	LinearLayout mViewNetworkProviderOff;
 	LinearLayout mViewListview;
@@ -51,6 +47,8 @@ public class NavCheckinActivity extends SherlockFragment {
 
 	private LocationManager mLocationManager;
 	private Location mLocation;
+
+    private VenuesSearchResult mVenuesSearchResult;
 
 	private List<AsyncTask> mTaskList = new ArrayList<AsyncTask>();
 
@@ -72,10 +70,34 @@ public class NavCheckinActivity extends SherlockFragment {
 //        setContentView(R.layout.nav_checkin);
         mTaskList.clear();
         setHasOptionsMenu(true);
-		log.debug("onCreate");
+        mLog.debug("onCreate");
+        if (savedInstanceState != null && !savedInstanceState.isEmpty()) {
+            mLocation = new Location(LocationManager.NETWORK_PROVIDER);
+            if (savedInstanceState.containsKey("location.lat")) {
+                mLocation.setLatitude(savedInstanceState.getDouble("location.lat"));
+            }
+            if (savedInstanceState.containsKey("location.lng")) {
+                mLocation.setLongitude(savedInstanceState.getDouble("location.lng"));
+            }
+            if (savedInstanceState.containsKey("venues")) {
+                mVenuesSearchResult = (VenuesSearchResult)savedInstanceState.getSerializable("venues");
+            }
 
-
+        }
 	}
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (mLocation != null) {
+            outState.putDouble("location.lat", mLocation.getLatitude());
+            outState.putDouble("location.lng", mLocation.getLongitude());
+        }
+        if (mVenuesSearchResult != null) {
+            outState.putSerializable("venues", mVenuesSearchResult);
+        }
+
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -84,9 +106,16 @@ public class NavCheckinActivity extends SherlockFragment {
         View v = inflater.inflate(R.layout.nav_checkin, container, false);
 
         setupView(v);
-        mViewNoLocationProviders.setVisibility(View.GONE);
-        mVenueListView.setVisibility(View.GONE);
-        this.getLocation();
+        if (mVenuesSearchResult == null) {
+            mViewNoLocationProviders.setVisibility(View.GONE);
+            mVenueListView.setVisibility(View.GONE);
+            this.getLocation();
+        } else {
+            mViewNoLocationProviders.setVisibility(View.GONE);
+            mVenueListView.setVisibility(View.VISIBLE);
+            updateListView(mVenuesSearchResult);
+        }
+
         return v;
     }
 
@@ -135,9 +164,10 @@ public class NavCheckinActivity extends SherlockFragment {
 			double lat = location.getLatitude();
 			double lng = location.getLongitude();
 			mLocation = location;
-			log.debug("lat:" + lat + " lng:" + lng);
+            mLog.debug("lat:" + lat + " lng:" + lng);
 		} else {
-			log.debug("Can't access your location");
+            mLog.debug("Can't access your location");
+            Toast.makeText(this.getSherlockActivity(), "Can't access your location", Toast.LENGTH_LONG).show();
 		}
 		mLocationManager.removeUpdates(mLocationListener);
 
@@ -163,13 +193,13 @@ public class NavCheckinActivity extends SherlockFragment {
 		@Override
 		public void onProviderEnabled(String provider) {
 			// TODO Auto-generated method stub
-			log.info("Provider(" + provider + ") now is enabled");
+            mLog.info("Provider(" + provider + ") now is enabled");
 		}
 
 		@Override
 		public void onProviderDisabled(String provider) {
 			// TODO Auto-generated method stub
-			log.warn("Provider(" + provider + ") now is disabled");
+            mLog.warn("Provider(" + provider + ") now is disabled");
 		}
 
 		@Override
@@ -247,11 +277,11 @@ public class NavCheckinActivity extends SherlockFragment {
 		return provider1.equals(provider2);
 	}
 
-	private void updateListView(final Result<VenuesSearchResult> result) {
+	private void updateListView(final VenuesSearchResult result) {
 		this.mEmptyLoadingLayout.setVisibility(View.GONE);
 		this.mViewListview.setVisibility(View.VISIBLE);
 
-		log.debug(result.getResult().getVenues().length);
+        mLog.debug(result.getVenues().length);
 
 		VenueAdapter venueAdapter = new VenueAdapter(getActivity(), result);
 		this.mVenueListView.setAdapter(venueAdapter);
@@ -265,24 +295,20 @@ public class NavCheckinActivity extends SherlockFragment {
 							int arg2, long arg3) {
 						// TODO Auto-generated method stub
 						// result.getResult().getVenues()[arg2]
-						log.debug("click at" + arg2);
+                        mLog.debug("click at" + arg2);
 						Bundle bundle = new Bundle();
 
-						bundle.putString("venueId", result.getResult()
-								.getVenues()[arg2].getId());
-						bundle.putString("venueName", result.getResult()
-								.getVenues()[arg2].getName());
+						bundle.putString("venueId", result.getVenues()[arg2].getId());
+						bundle.putString("venueName", result.getVenues()[arg2].getName());
 						bundle.putDouble("lat",
-								result.getResult().getVenues()[arg2]
-										.getLocation().getLat());
+								result.getVenues()[arg2].getLocation().getLat());
 						bundle.putDouble("lng",
-								result.getResult().getVenues()[arg2]
-										.getLocation().getLng());
+								result.getVenues()[arg2].getLocation().getLng());
 
 						Intent intent = new Intent(getActivity(),
 								CheckinActivity.class);
 						intent.putExtra("bundle", bundle);
-                        intent.putExtra(Constants.KEY_VENUE, result.getResult().getVenues()[arg2]);
+                        intent.putExtra(Constants.KEY_VENUE, result.getVenues()[arg2]);
 						startActivity(intent);
 					}
 				});
@@ -330,11 +356,11 @@ public class NavCheckinActivity extends SherlockFragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
 		case Menu.FIRST:
-			log.debug("刷新");
+            mLog.debug("刷新");
 			getLocation();
 			break;
 		case Menu.FIRST + 1:
-			log.debug("设置");
+            mLog.debug("设置");
 			break;
 		}
         return super.onOptionsItemSelected(item);
@@ -362,7 +388,7 @@ public class NavCheckinActivity extends SherlockFragment {
 			mLocationManager.removeUpdates(mLocationListener);
 			// mLocationManagerProxy.removeUpdates(mLocationListener);
 		} catch (Exception e) {
-			log.warn("mLocationManager has removeUpdates");
+            mLog.warn("mLocationManager has removeUpdates");
 		}
     }
 
@@ -419,7 +445,8 @@ public class NavCheckinActivity extends SherlockFragment {
         protected void onPostExecute(Result<VenuesSearchResult> result) {
             if(result != null) {
                 if (result.getMeta().getCode() == 200) {
-                    updateListView(result);
+                    mVenuesSearchResult = result.getResult();
+                    updateListView(result.getResult());
                 } else {
                     Toast.makeText(getActivity(), result.getMeta().getErrorDetail(), Toast.LENGTH_LONG).show();
                 }
@@ -434,14 +461,14 @@ public class NavCheckinActivity extends SherlockFragment {
 
 		LayoutInflater mInflater;
 		Context mContext;
-		Result<VenuesSearchResult> mResult;
+		VenuesSearchResult mResult;
 
 		public VenueAdapter(Context context) {
 			this.mContext = context;
 			mInflater = LayoutInflater.from(context);
 		}
 
-		public VenueAdapter(Context context, Result<VenuesSearchResult> result) {
+		public VenueAdapter(Context context, VenuesSearchResult result) {
 			this.mContext = context;
 			this.mResult = result;
 			mInflater = LayoutInflater.from(context);
@@ -449,13 +476,13 @@ public class NavCheckinActivity extends SherlockFragment {
 
 		@Override
 		public int getCount() {
-			return mResult.getResult().getVenues().length;
+			return mResult.getVenues().length;
 		}
 
 		@Override
 		public Object getItem(int position) {
 			if (position <= getCount()) {
-				return mResult.getResult().getVenues()[position];
+				return mResult.getVenues()[position];
 			} else {
 				return null;
 			}
@@ -500,8 +527,8 @@ public class NavCheckinActivity extends SherlockFragment {
 
 			}
 
-			CompactVenue venue = this.mResult.getResult().getVenues()[position];
-			log.debug("position = " + position + ";venue =" + venue.getName()
+			CompactVenue venue = this.mResult.getVenues()[position];
+            mLog.debug("position = " + position + ";venue =" + venue.getName()
 					+ ";lat=" + venue.getLocation().getLat());
 			holder.venueName.setText(venue.getName());
 			String address = getAddress(venue.getLocation());

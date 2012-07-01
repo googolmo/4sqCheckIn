@@ -5,15 +5,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TabHost;
 import android.widget.TabWidget;
-import android.widget.TableLayout;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.googolmo.foursquare.app.NavCheckinActivity;
 import com.googolmo.foursquare.app.NavFriendActivity;
@@ -21,13 +19,12 @@ import com.googolmo.foursquare.app.NavMeActivity;
 import com.googolmo.foursquare.app.OAuthAcitivity;
 import com.googolmo.foursquare.utils.LogUtil;
 import com.googolmo.foursquare.utils.PreferenceUtil;
-import com.viewpagerindicator.UnderlinePageIndicator;
 
 import java.util.ArrayList;
 
 public class MainActivity extends SherlockFragmentActivity {
 
-	private LogUtil mLog = LogUtil.getLog(MainActivity.class.getName());
+	LogUtil mLog = LogUtil.getLog(MainActivity.class.getName());
 
     private String mOAuthToken;
 
@@ -37,6 +34,7 @@ public class MainActivity extends SherlockFragmentActivity {
 
     private TabHost mTabHost;
     private TabsAdapter mTabsAdapter;
+//    private ActionBar.Tab mTab;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -58,7 +56,7 @@ public class MainActivity extends SherlockFragmentActivity {
         }
         getSupportActionBar();
 
-
+//        mTab = getSupportActionBar().newTab();
 
 	}
 
@@ -173,6 +171,7 @@ public class MainActivity extends SherlockFragmentActivity {
         @Override
         public Fragment getItem(int i) {
             TabInfo info = mTabs.get(i);
+            Log.d(MainActivity.class.getName(), "tabInfo.position=" + i + "className = " + info.cls.getName());
             return Fragment.instantiate(mContext, info.cls.getName(), info.args);
 
 
@@ -194,11 +193,14 @@ public class MainActivity extends SherlockFragmentActivity {
 
         @Override
         public void onPageScrollStateChanged(int i) {
+            //
         }
 
         @Override
         public void onTabChanged(String tabId) {
             int position = mTabHost.getCurrentTab();
+            Log.d(MainActivity.class.getName(), "mTabHost.getCurrentTab()==" + position);
+//            Toast.makeText(mContext, "mTabHost.getCurrentTab()==" + position, Toast.LENGTH_SHORT).show();
             mViewPager.setCurrentItem(position);
         }
     }

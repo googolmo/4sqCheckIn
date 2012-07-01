@@ -51,8 +51,6 @@
       <excludeFolder url="file://$MODULE_DIR$/target/generated-sources/combined-assets" />
       <excludeFolder url="file://$MODULE_DIR$/target/generated-sources/combined-resources" />
       <excludeFolder url="file://$MODULE_DIR$/target/generated-sources/extracted-dependencies" />
-      <excludeFolder url="file://$MODULE_DIR$/target/libs" />
-      <excludeFolder url="file://$MODULE_DIR$/target/maven-archiver" />
       <excludeFolder url="file://$MODULE_DIR$/target/unpack" />
     </content>
     <orderEntry type="sourceFolder" forTests="false" />
@@ -68,12 +66,8 @@
     <orderEntry type="library" scope="PROVIDED" name="Maven: xpp3:xpp3:1.1.4c" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.json:json:20080701" level="project" />
     <orderEntry type="library" name="Maven: com.google.android:support-v4:r7" level="project" />
-    <orderEntry type="library" name="Maven: com.actionbarsherlock:library:apklib:4.1.0" level="project" />
-    <orderEntry type="library" name="Maven: org.json:org.json:chargebee-1.0" level="project" />
-    <orderEntry type="library" name="Maven: com.viewpagerindicator:library:apklib:2.3.1" level="project" />
     <orderEntry type="jdk" jdkName="Android 4.0.3 Platform" jdkType="Android SDK" />
     <orderEntry type="module" module-name="~apklib-com.actionbarsherlock_library_4.1.0" />
-    <orderEntry type="module" module-name="~apklib-com.viewpagerindicator_library_2.3.1" />
   </component>
   <component name="POM File Configuration" pomFile="" />
 </module>
